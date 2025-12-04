@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Pengaturan • BIG Motor</title>
+<title>User Area • BIG Motor</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
 
@@ -26,6 +26,7 @@ function guardedNavigate(url){
   window.location = url;
 }
 
+
 /* ======= Init ======= */
 document.addEventListener("DOMContentLoaded", ()=>{
   loadUsers();
@@ -36,6 +37,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
 </script>
 
 <style>
+    #previewFotoBg { display:none; }
 /* ====== Base / layout ====== */
 :root{--card:#fff}
 body{
@@ -179,9 +181,11 @@ body{
 
 /* ========== NAVBAR EXACT 1:1 (from home.html) ========== */
 .navbar{
-  position:fixed; bottom:0; left:0; right:0;
+  position:fixed;
+  bottom:0;left:0;right:0;
   background:#fff;
-  display:flex; justify-content:space-around;
+  display:flex;
+  justify-content:space-around;
   padding:8px 0 6px;
   border-top:1px solid #e6e6e6;
   box-shadow:0 -3px 10px rgba(0,0,0,0.06);
@@ -275,11 +279,21 @@ body{
     <img src="assets/riwayat.png">Riwayat
   </div>
   <div class="nav-item nav-active" id="navPengaturan" onclick="bounceThenNavigate(this,'pengaturan.html')">
-    <img src="assets/pengaturan.png">Pengaturan
+    <img src="assets/pengaturan.png">Fitur
   </div>
 </div>
 
+
+<!-- POPUP PREVIEW FOTO BARU -->
+<div id="previewFotoBg" class="popup-bg">
+  <div class="popup-box" style="padding:0;overflow:hidden">
+      <img id="previewFotoImg" src="" style="width:100%;height:auto;display:block;">
+      <button onclick="uploadFotoFinal()" style="width:100%;padding:12px;background:#16a34a;color:#fff;border:0;font-weight:700;font-size:15px">Simpan Foto</button>
+      <button onclick="closePreviewFoto()" style="width:100%;padding:12px;background:#ef4444;color:#fff;border:0;font-weight:700;margin-top:4px">Batal</button>
+  </div>
+</div>
 <script>
+    
 /* ====== Render & logic (minimal, only necessary) ====== */
 async function loadUsers(){
   try{
@@ -346,32 +360,56 @@ function renderUsers(list){
 function previewFoto(e,id){
   const f = e.target.files[0];
   if(!f) return;
-  pendingFile = f; pendingId = id;
-  document.getElementById("pfp_"+id).src = URL.createObjectURL(f);
-  document.getElementById("saveFotoBtn").style.display = "block";
+
+  pendingFile = f;
+  pendingId = id;
+
+  const url = URL.createObjectURL(f);
+
+  // tampilkan popup preview
+  document.getElementById("previewFotoImg").src = url;
+  document.getElementById("previewFotoBg").style.display = "flex";
 }
 
 /* upload */
 async function uploadFotoFinal(){
   if(!pendingFile){ showToast("Tidak ada foto"); return; }
+
+  // Tutup popup
+  document.getElementById("previewFotoBg").style.display="none";
+
   const fd = new FormData();
   fd.append("file", pendingFile);
   fd.append("upload_preset", CLOUDINARY_PRESET);
+
   try{
     const up = await fetch(CLOUDINARY_UPLOAD,{method:"POST",body:fd});
     const img = await up.json();
     if(!img.secure_url){ showToast("Upload gagal"); return; }
+
     await fetch(API_BASE + "/api/user/foto/" + pendingId, {
-      method:"PUT", headers:{"Content-Type":"application/json"},
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
       body: JSON.stringify({ foto: img.secure_url })
     });
+
     showToast("Foto diperbarui");
-    pendingFile = null; pendingId = null;
-    document.getElementById("saveFotoBtn").style.display="none";
+
+    pendingFile = null;
+    pendingId = null;
+
     loadUsers();
+
   }catch(err){
-    console.error(err); showToast("Upload gagal");
+    console.error(err);
+    showToast("Upload gagal");
   }
+}
+
+function closePreviewFoto(){
+  pendingFile = null;
+  pendingId = null;
+  document.getElementById("previewFotoBg").style.display = "none";
 }
 
 /* full image */
