@@ -1,4 +1,4 @@
-const CACHE_NAME = "bigmotor-cache-v2";
+const CACHE_NAME = "bigmotor-cache-v3";
 
 const ASSETS = [
   "/", 
