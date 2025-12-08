@@ -87,7 +87,10 @@ body{
   align-items:center;
   justify-content:center;
 }
-
+#dailyDonut{
+  min-width:130px;
+  min-height:130px;
+}
 /* MINI PIE LEGEND */
 .pieLegend{
   margin-top:6px;
@@ -339,43 +342,166 @@ function drawPie(el,vals,colors){
   el.appendChild(svg);
 }
 
-function drawDonut(el, vals, colors){
-  el.innerHTML = "";
-  const total = vals.reduce((a,b)=>a+b,0) || 1;
-  const size = el.clientHeight;
-  const cx = size/2, cy = size/2, r = size/2 - 10, innerR = r * 0.55;
+function drawDonut(el, vals, colors) {
+  // Pastikan elemen sudah punya tinggi
+  let tries = 0;
+  function wait() {
+    if (el.clientHeight === 0 && tries < 10) {
+      tries++;
+      requestAnimationFrame(wait);
+      return;
+    }
+    render();
+  }
+  wait();
 
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", size);
-  svg.setAttribute("height", size);
+  function render() {
+    el.innerHTML = "";
 
-  let ang = -Math.PI/2;
+    // Konversi ke angka
+    vals = vals.map(v => Number(v) || 0);
+    let penjualan = vals[0];
+    let pengeluaran = vals[1];
 
-  vals.forEach((v,i)=>{
-    const a = (v/total) * Math.PI*2;
-    const x1 = cx + r * Math.cos(ang);
-    const y1 = cy + r * Math.sin(ang);
-    const x2 = cx + r * Math.cos(ang + a);
-    const y2 = cy + r * Math.sin(ang + a);
-    const large = a > Math.PI ? 1 : 0;
+    const W = el.clientWidth;
+    const H = el.clientHeight;
+    const cx = W / 2;
+    const cy = H / 2;
+    const r = (Math.min(W, H) / 2) - 10;
+    const innerR = r * 0.55;
 
-    const path = document.createElementNS("http://www.w3.org/2000/svg","path");
-    path.setAttribute("fill", colors[i]);
-    path.setAttribute(
-      "d",
-      `M ${x1} ${y1}
-       A ${r} ${r} 0 ${large} 1 ${x2} ${y2}
-       L ${cx + innerR*Math.cos(ang + a)} ${cy + innerR*Math.sin(ang + a)}
-       A ${innerR} ${innerR} 0 ${large} 0 ${cx + innerR*Math.cos(ang)} ${cy + innerR*Math.sin(ang)}
-       Z`
-    );
-    svg.appendChild(path);
-    ang += a;
-  });
+    const svgNS = "http://www.w3.org/2000/svg";
 
-  el.appendChild(svg);
+    // ============================
+    //  KASUS 1: Dua-duanya 0
+    // ============================
+    if (penjualan === 0 && pengeluaran === 0) {
+      const svg = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("width", W);
+      svg.setAttribute("height", H);
+
+      // lingkaran luar abu2
+      const c1 = document.createElementNS(svgNS, "circle");
+      c1.setAttribute("cx", cx);
+      c1.setAttribute("cy", cy);
+      c1.setAttribute("r", r);
+      c1.setAttribute("fill", "#e5e7eb"); // abu abu
+      svg.appendChild(c1);
+
+      // lingkaran dalam putih
+      const c2 = document.createElementNS(svgNS, "circle");
+      c2.setAttribute("cx", cx);
+      c2.setAttribute("cy", cy);
+      c2.setAttribute("r", innerR);
+      c2.setAttribute("fill", "white");
+      svg.appendChild(c2);
+
+      el.appendChild(svg);
+      return;
+    }
+
+    // ============================
+    //  KASUS 2: hanya PENJUALAN ada
+    // ============================
+    if (penjualan > 0 && pengeluaran === 0) {
+      const svg = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("width", W);
+      svg.setAttribute("height", H);
+
+      // lingkaran penuh warna penjualan
+      const c1 = document.createElementNS(svgNS, "circle");
+      c1.setAttribute("cx", cx);
+      c1.setAttribute("cy", cy);
+      c1.setAttribute("r", r);
+      c1.setAttribute("fill", colors[0]);
+      svg.appendChild(c1);
+
+      // lingkaran dalam
+      const c2 = document.createElementNS(svgNS, "circle");
+      c2.setAttribute("cx", cx);
+      c2.setAttribute("cy", cy);
+      c2.setAttribute("r", innerR);
+      c2.setAttribute("fill", "white");
+      svg.appendChild(c2);
+
+      el.appendChild(svg);
+      return;
+    }
+
+    // ============================
+    //  KASUS 3: hanya PENGELUARAN ada
+    // ============================
+    if (penjualan === 0 && pengeluaran > 0) {
+      const svg = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("width", W);
+      svg.setAttribute("height", H);
+
+      // lingkaran penuh warna pengeluaran
+      const c1 = document.createElementNS(svgNS, "circle");
+      c1.setAttribute("cx", cx);
+      c1.setAttribute("cy", cy);
+      c1.setAttribute("r", r);
+      c1.setAttribute("fill", colors[1]);
+      svg.appendChild(c1);
+
+      // lingkaran dalam
+      const c2 = document.createElementNS(svgNS, "circle");
+      c2.setAttribute("cx", cx);
+      c2.setAttribute("cy", cy);
+      c2.setAttribute("r", innerR);
+      c2.setAttribute("fill", "white");
+      svg.appendChild(c2);
+
+      el.appendChild(svg);
+      return;
+    }
+
+    // ============================
+    //  KASUS 4: Dua-duanya ada (normal donut)
+    // ============================
+    const total = penjualan + pengeluaran;
+    const slices = [
+      { v: penjualan, color: colors[0] },
+      { v: pengeluaran, color: colors[1] }
+    ];
+
+    let angStart = -Math.PI / 2;
+
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", W);
+    svg.setAttribute("height", H);
+
+    slices.forEach(s => {
+      const a = (s.v / total) * Math.PI * 2;
+
+      if (a <= 0) return; // skip slice nol
+
+      const x1 = cx + r * Math.cos(angStart);
+      const y1 = cy + r * Math.sin(angStart);
+      const x2 = cx + r * Math.cos(angStart + a);
+      const y2 = cy + r * Math.sin(angStart + a);
+      const largeArc = a > Math.PI ? 1 : 0;
+
+      const path = document.createElementNS(svgNS, "path");
+      path.setAttribute("fill", s.color);
+      path.setAttribute(
+        "d",
+        `
+        M ${x1} ${y1}
+        A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}
+        L ${cx + innerR * Math.cos(angStart + a)} ${cy + innerR * Math.sin(angStart + a)}
+        A ${innerR} ${innerR} 0 ${largeArc} 0 ${cx + innerR * Math.cos(angStart)} ${cy + innerR * Math.sin(angStart)}
+        Z
+        `
+      );
+
+      svg.appendChild(path);
+      angStart += a;
+    });
+
+    el.appendChild(svg);
+  }
 }
-
 /* BAR CHART */
 function drawBarBoxes(el,days,pen,out,prof){
   el.innerHTML="";
@@ -458,13 +584,43 @@ async function loadSummary(){
     $("dailyPenjualan").textContent   = currency(penjualan);
     $("dailyPengeluaran").textContent = currency(pengeluaran);
 
-    drawDonut(
-      $("dailyDonut"),
-      [penjualan, pengeluaran],
-      ["#3E8BFF", "#ef4444"]
-    );
+// ambil elemen metric
+const boxPenjualan   = document.querySelectorAll(".metric")[0];
+const boxPengeluaran = document.querySelectorAll(".metric")[1];
 
-    $("dailyNote").textContent = "Tanggal: " + row.tanggal;
+// warna soft
+const softBlue  = "#e8f2ff";
+const softRed   = "#ffecec";
+const softGray  = "#f3f4f6";
+
+// PENJUALAN
+if (penjualan > 0) {
+  boxPenjualan.style.background = softBlue;
+} else {
+  boxPenjualan.style.background = softGray;
+}
+
+// PENGELUARAN
+if (pengeluaran > 0) {
+  boxPengeluaran.style.background = softRed;
+} else {
+  boxPengeluaran.style.background = softGray;
+}
+    drawDonut(
+  $("dailyDonut"),
+  [Number(penjualan) || 0, Number(pengeluaran) || 0],
+  ["#3E8BFF", "#ef4444"]
+);
+
+    // format tanggal: 25 November 2025
+const d = new Date(row.tanggal);
+const tgl = d.toLocaleDateString("id-ID", {
+  day: "2-digit",
+  month: "long",
+  year: "numeric"
+});
+
+$("dailyNote").textContent = "Tanggal: " + tgl;
 
   }catch(err){
     $("dailyNote").textContent = "Gagal memuat";
