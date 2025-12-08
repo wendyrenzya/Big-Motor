@@ -1,4 +1,4 @@
-const CACHE_NAME = "bigmotor-cache-v5";
+const CACHE_NAME = "bigmotor-cache-v6";
 
 const ASSETS = [
   "/", 
@@ -9,6 +9,8 @@ const ASSETS = [
   "/absen.html",
   "/add_item.html",
   "/app.js",
+  "/img-cache.js",
+  "/sw-images.js",
   "/audit.html",
   "/barang.html",
   "/barang_detail.html",
@@ -16,6 +18,7 @@ const ASSETS = [
   "/bonus.html",
   "/buat_katalog.html",
   "/harga.html",
+  "/invoice.html",
   "/katalog.html",
   "/laporan.html",
   "/laporan_harian.html",
@@ -28,6 +31,7 @@ const ASSETS = [
   "/servis.html",
   "/servis_detail.html",
   "/stok_masuk.html",
+  "/stok_kosong.html",
   "/struk.html",
   "/tambah_barang.html",
   "/tambah_servis.html",
