@@ -526,7 +526,15 @@ function render(items){
       <div class="item-info">
         <div class="item-name">${highlight(it.nama,q)}</div>
         <div class="item-meta">${highlight(it.kategori||"-",q)} • Rp ${Number(it.harga).toLocaleString("id-ID")}</div>
-        <div class="item-extra">Kode: ${it.kode_barang||"-"} • Stok: ${it.stock||0}</div>
+        <div class="item-extra">
+  Kode: ${it.kode_barang||"-"} • 
+  <span style="
+    font-weight:800;
+    color:${(it.stock||0) > 0 ? '#1fa71f' : '#d82828'};
+  ">
+    Stok: ${it.stock||0}
+  </span>
+</div>
       </div>
     `;
     root.appendChild(d);

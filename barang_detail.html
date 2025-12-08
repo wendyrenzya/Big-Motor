@@ -186,7 +186,7 @@ body { margin:0; font-family:Inter,Roboto; background:#fff; }
 
 <!-- HEADER -->
 <div class="header">
-  <img src="assets/back_white.png" id="btnBack" style="width:22px;height:22px;cursor:pointer">
+  <img src="assets/back.png" id="btnBack" style="width:22px;height:22px;cursor:pointer">
   Detail Barang
 </div>
 
@@ -255,8 +255,11 @@ async function loadDetail(){
 
   <div class="card">
     <div class="row"><div>Kode Barang</div><div>${data.kode_barang || "-"}</div></div>
-    <div class="row"><div>Kategori</div><div>${data.kategori || "-"}</div></div>
     <div class="row"><div>Harga</div><div>Rp ${(data.harga || 0).toLocaleString("id-ID")}</div></div>
+    <div class="row"><div>Harga Modal</div><div>Rp ${(data.harga_modal || 0).toLocaleString("id-ID")}</div></div>
+      <div class="row"><div>Kategori</div><div>${data.kategori || "-"}</div></div>
+<div class="row"><div>Catatan</div><div style="max-width:160px;text-align:right;">${data.catatan || "-"}</div></div>
+  </div>
   </div>
 `;
   }
