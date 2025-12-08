@@ -13,7 +13,7 @@
     font-family:Inter,Segoe UI,Roboto;
   }
 
-/* ========== HEADER STYLE DARI list_katalog.html ========== */
+/* ========== HEADER STYLE ========== */
 .header-wrap{ position:relative; }
 
 .header{
@@ -116,18 +116,40 @@
     background:#3E8BFF;color:#fff;border:0;padding:10px 14px;
     border-radius:8px;font-weight:700;cursor:pointer;
   }
+
+/* ========== FAB BACK BUTTON ========== */
+.fab-back{
+  position:fixed;
+  left:16px;
+  bottom:16px;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:#ffffff;
+  box-shadow:0 4px 18px rgba(0,0,0,0.22);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  z-index:99999;
+}
+.fab-back img{
+  width:32px;
+  height:32px;
+  object-fit:contain;
+}
+
 </style>
 </head>
 
 <body>
 
 <!-- HEADER -->
-<!-- HEADER -->
 <div class="header-wrap">
   <div class="header">
     <div class="h-title">Absensi</div>
-    <div class="h-sub" id="headerTime"></div>
-    <div class="h-web">www.bigmotortingkulu.com</div>
+     <div class="h-web">BIG Motor Tingkulu</div>
+    <div class="h-sub" id="headerTime"></div> 
     <img src="assets/absensi.png" class="header-icon">
   </div>
 </div>
@@ -146,21 +168,23 @@
   </div>
 </div>
 
+<!-- FAB BACK -->
+<div class="fab-back" id="fabBack">
+  <img src="assets/back_white.png">
+</div>
+
 <script>
+/* ============================================================
+   BASE
+============================================================ */
 const API_BASE = "https://api.bigmotor.biz.id";
 
 /* ============================================================
-   WITA HELPERS — gunakan waktu lokal HP (yang sudah WITA)
+   WITA HELPERS
 ============================================================ */
-function nowWITA(){
-  return new Date(); // HP sudah di WITA
-}
-function isoToWITA(iso){
-  return new Date(iso); // tampil sesuai lokal HP
-}
-function todayWITA(){
-  return nowWITA().toLocaleDateString("en-CA"); // YYYY-MM-DD
-}
+function nowWITA(){ return new Date(); }
+function isoToWITA(i){ return new Date(i); }
+function todayWITA(){ return nowWITA().toLocaleDateString("en-CA"); }
 
 /* ============================================================
    HEADER TIME
@@ -182,8 +206,8 @@ updateHeaderTime();
 /* ============================================================
    FORMAT WAKTU (CARD)
 ============================================================ */
-function formatWaktu(iso){
-  const d = isoToWITA(iso);
+function formatWaktu(i){
+  const d = isoToWITA(i);
   const hari=["Min","Sen","Sel","Rab","Kam","Jum","Sab"][d.getDay()];
   const bln=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"][d.getMonth()];
   const tgl=d.getDate().toString().padStart(2,"0");
@@ -191,19 +215,6 @@ function formatWaktu(iso){
   const jam=d.getHours().toString().padStart(2,"0");
   const mnt=d.getMinutes().toString().padStart(2,"0");
   return `${hari}, ${tgl} ${bln} ${thn}, ${jam}:${mnt}`;
-}
-
-/* ============================================================
-   GPS DISTANCE
-============================================================ */
-function jarakMeter(lat1,lon1,lat2,lon2){
-  const R=6371000;
-  const dLat=(lat2-lat1)*Math.PI/180;
-  const dLon=(lon2-lon1)*Math.PI/180;
-  const a=Math.sin(dLat/2)**2+
-          Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
-          Math.sin(dLon/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
 
 /* ============================================================
@@ -219,15 +230,25 @@ function closePopup(){
 }
 
 /* ============================================================
-   CACHE
+   GPS DISTANCE
+============================================================ */
+function jarakMeter(a,b,c,d){
+  const R=6371000;
+  const dLat=(c-a)*Math.PI/180;
+  const dLon=(d-b)*Math.PI/180;
+  const A=Math.sin(dLat/2)**2 +
+           Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180) *
+           Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(A),Math.sqrt(1-A));
+}
+
+/* ============================================================
+   USER & FOTO CACHE
 ============================================================ */
 let _itemsCache = [];
 const _namaMap = {};
 const _avatarCache = new Map();
 
-/* ============================================================
-   LOAD USERS
-============================================================ */
 async function loadUsers(){
   const res=await fetch(API_BASE+"/api/users",{
     headers:{ "Authorization":"Bearer "+localStorage.getItem("token") }
@@ -255,7 +276,7 @@ async function getAvatarUrl(username){
 }
 
 /* ============================================================
-   RENDER CARD
+   RENDER ABSENSI CARD
 ============================================================ */
 function tambahCard(username,meter,waktu){
   const wrap=document.getElementById("listAbsensi");
@@ -283,23 +304,23 @@ function tambahCard(username,meter,waktu){
 }
 
 /* ============================================================
-   LAST ABSEN LOGIC
+   LAST ABSEN
 ============================================================ */
-function getLastAbsenUser(items, username){
-  const list = items.filter(x => x.username === username);
-  if(list.length === 0) return null;
-  return list[list.length - 1];
+function getLastAbsenUser(list, u){
+  const arr=list.filter(x=>x.username===u);
+  if(arr.length===0) return null;
+  return arr[arr.length-1];
 }
 
-function isSameDayWITA(iso){
-  const d = isoToWITA(iso);
+function isSameDayWITA(i){
+  const d = isoToWITA(i);
   return d.toLocaleDateString("en-CA") === todayWITA();
 }
 
 function updateButtonState(){
   const btn=document.getElementById("btnAbsen");
-  const user=localStorage.getItem("username");
-  const last=getLastAbsenUser(_itemsCache,user);
+  const u=localStorage.getItem("username");
+  const last=getLastAbsenUser(_itemsCache,u);
 
   if(!last){
     btn.disabled=false;
@@ -332,7 +353,7 @@ async function loadAbsensi(){
   });
   const data=await res.json();
 
-  _itemsCache = (data.items||[]).reverse();
+  _itemsCache=(data.items||[]).reverse();
 
   document.getElementById("listAbsensi").innerHTML="";
 
@@ -349,20 +370,17 @@ async function loadAbsensi(){
   updateButtonState();
 }
 
-/* ============================================================
-   AUTO UPDATE BUTTON EVERY MINUTE
-============================================================ */
 setInterval(updateButtonState,60000);
 
 /* ============================================================
    CLICK ABSEN
 ============================================================ */
 function onAbsenClick(){
-  const user=localStorage.getItem("username");
-  const last=getLastAbsenUser(_itemsCache,user);
+  const u=localStorage.getItem("username");
+  const last=getLastAbsenUser(_itemsCache,u);
 
   if(last && isSameDayWITA(last.waktu)){
-    showPopup("Peringatan","Cuma perlu absen 1x sehari");
+    showPopup("Peringatan","Hanya perlu absen 1x sehari.");
     return;
   }
 
@@ -370,7 +388,7 @@ function onAbsenClick(){
 }
 
 /* ============================================================
-   GPS
+   GPS GET & SEND
 ============================================================ */
 function ambilLokasiDanAbsen(){
   navigator.geolocation.getCurrentPosition(
@@ -385,18 +403,13 @@ function ambilLokasiDanAbsen(){
       kirimAbsen(meter);
     },
     ()=>showPopup("Error","GPS gagal. Aktifkan lokasi."),
-    {enableHighAccuracy:true,timeout:8000}
+    {enableHighAccuracy:true,timeout:9000}
   );
 }
 
-/* ============================================================
-   KIRIM ABSEN
-============================================================ */
 async function kirimAbsen(meter){
   const username=localStorage.getItem("username");
-
-  // Simpan waktu dalam UTC asli
-  const waktu = new Date().toISOString();
+  const waktu=new Date().toISOString();
 
   const res=await fetch(API_BASE+"/api/absensi",{
     method:"POST",
@@ -416,11 +429,16 @@ async function kirimAbsen(meter){
 
   _itemsCache.push({ username, lokasi:meter, waktu });
   tambahCard(username,meter,waktu);
-
   updateButtonState();
 
-  showPopup("Berhasil","Absen sudah masuk record");
+  showPopup("Berhasil","Absen telah direkam");
 }
+
+/* ============================================================
+   FAB BACK (kiri bawah)
+============================================================ */
+document.getElementById("fabBack").onclick=()=>history.back();
+
 </script>
 
 </body>

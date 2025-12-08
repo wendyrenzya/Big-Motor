@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stok Kosong</title>
+
+<style>
+/* HEADER (mengikuti barang.html) */
+.header{
+  background:linear-gradient(90deg,#e8f0ff,#f3f7ff);
+  padding:14px 16px;
+  position:sticky;top:0;z-index:20;
+  border-bottom:1px solid #e6eefc;
+  padding-right:90px;
+}
+.h-title{font-size:18px;font-weight:800;}
+.h-sub{font-size:14px;font-weight:600;color:#666;margin-top:2px;}
+.h-time{font-size:13px;color:#666;margin-top:6px;}
+.header-wrap{position:relative;}
+.header-icon{
+  position:absolute;
+  right:14px;top:50%;transform:translateY(-50%);
+  width:60px;height:auto;z-index:5;
+}
+
+:root{
+  --primary:#3E8BFF;
+  --danger:#FF3B30;
+  --bg:#f5f6f8;
+  --card:#ffffff;
+}
+
+/* GLOBAL */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html, body{margin:0;padding:0;width:100%;height:100%;background:var(--bg);font-family:Inter;}
+body{overflow-y:hidden;}
+
+/* KATEGORI BAR */
+.cat-bar{
+  display:flex;gap:10px;overflow-x:auto;
+  padding:10px 14px;background:#fff;
+  border-bottom:1px solid #eee;
+}
+.cat-btn{
+  padding:8px 14px;background:#f3f3f3;border-radius:14px;
+  font-weight:700;font-size:14px;white-space:nowrap;cursor:pointer;
+}
+.cat-btn.active{background:var(--primary);color:#fff;}
+
+/* FILTER BUTTONS */
+.filter-buttons{
+  display:flex;gap:10px;padding:10px 14px;
+  background:#fff;border-bottom:1px solid #eee;
+}
+.f-btn{
+  flex:1;
+  text-align:center;
+  padding:10px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:700;
+  font-size:14px;
+  background:#f0f4ff;
+  color:#2d5cff;
+  box-shadow:0 4px 12px rgba(0,0,0,0.06);
+}
+.reset-btn{
+  background:#ffecec;
+  color:#c62828;
+}
+
+/* GRID LIST */
+.list{
+  position:fixed;
+  top:240px;
+  left:0;right:0;bottom:0;
+  overflow-y:auto;
+  padding:14px;
+
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+
+  align-items:start; /* FIX overflow ketika hanya 1 item */
+}
+
+/* ITEM */
+.g-item{
+  background:#fff;border-radius:14px;padding:10px;
+  text-align:center;
+  cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,0.06);
+}
+.g-img{
+  width:70px;height:70px;border-radius:12px;
+  object-fit:cover;background:#eee;margin:0 auto;
+}
+.g-name{
+  font-size:13px;font-weight:800;margin-top:6px;
+  height:32px;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+}
+.g-stock{
+  margin-top:4px;font-size:12px;font-weight:800;color:var(--danger);
+}
+
+/* POPUP FILTER */
+.popup-bg{
+  position:fixed;left:0;top:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.35);
+  display:none;justify-content:center;align-items:center;
+  z-index:300;
+}
+.popup{
+  background:#fff;padding:20px;border-radius:16px;width:260px;text-align:center;
+}
+.popup-title{font-weight:800;margin-bottom:14px;font-size:16px;}
+.popup input{
+  width:100%;padding:10px;font-size:16px;border:1px solid #ccc;border-radius:10px;margin-bottom:16px;text-align:center;
+}
+.popup-btn{
+  padding:10px;border-radius:10px;font-weight:700;margin-top:4px;cursor:pointer;
+}
+.popup-ok{background:var(--primary);color:#fff;}
+.popup-cancel{background:#ddd;}
+
+/* FAB PUTIH KIRI BAWAH */
+.fab-back{
+  position:fixed;
+  left:16px;
+  bottom:16px;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:#ffffff;
+  box-shadow:0 4px 18px rgba(0,0,0,0.18);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  z-index:500;
+}
+.fab-back img{
+  width:32px;
+  height:32px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header-wrap">
+  <div class="header">
+    <div class="h-title">BIG Motor Tingkulu</div>
+    <div class="h-sub">Stok Monitor</div>
+    <div id="headerTime" class="h-time"></div>
+    <img src="assets/barang2.png" class="header-icon">
+  </div>
+</div>
+
+<!-- KATEGORI -->
+<div id="catBar" class="cat-bar"></div>
+
+<!-- FILTER BUTTONS -->
+<div class="filter-buttons">
+  <div class="f-btn" id="btnAtur">Set Stock</div>
+  <div class="f-btn reset-btn" id="btnReset">Reset</div>
+</div>
+
+<!-- LIST -->
+<div id="listRoot" class="list">Memuat...</div>
+
+<!-- POPUP FILTER -->
+<div id="popup" class="popup-bg">
+  <div class="popup">
+    <div class="popup-title">Minimum Stok</div>
+    <input id="minInput" type="number" min="0" placeholder="Contoh: 5">
+    <div class="popup-btn popup-ok" id="okMin">Terapkan</div>
+    <div class="popup-btn popup-cancel" id="cancelMin">Batal</div>
+  </div>
+</div>
+
+<!-- FAB BACK BUTTON -->
+<div class="fab-back" id="fabBack">
+  <img src="assets/back_white.png">
+</div>
+
+<script>
+const token = localStorage.getItem("token");
+if(!token) location.href="index.html";
+
+const API_BASE="https://api.bigmotor.biz.id";
+
+let DATA=[];
+let CAT="ALL";
+let MIN_STOCK=0;
+
+const PRIORITY=["Oli","Roda & Sistem Pengereman"];
+
+function esc(s){return (s||"").replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));}
+function norm(s){return (s||"").toLowerCase().trim();}
+
+/* LOAD */
+load();
+
+async function load(){
+  let r=await fetch(API_BASE+"/api/barang");
+  let j=await r.json();
+  DATA=j.items||[];
+  buildKategori();
+  apply();
+}
+
+async function buildKategori(){
+  let r=await fetch(API_BASE+"/api/kategori");
+  let j=await r.json();
+  let list=j.categories||[];
+
+  let ordered=[
+    ...PRIORITY.filter(p=>list.includes(p)),
+    ...list.filter(c=>!PRIORITY.includes(c)).sort()
+  ];
+
+  const bar=document.getElementById("catBar");
+  bar.innerHTML="";
+
+  let all=document.createElement("div");
+  all.className="cat-btn active";
+  all.innerText="Semua";
+  all.onclick=()=>selectCat("ALL",all);
+  bar.appendChild(all);
+
+  ordered.forEach(c=>{
+    let d=document.createElement("div");
+    d.className="cat-btn";
+    d.innerText=c;
+    d.onclick=()=>selectCat(c,d);
+    bar.appendChild(d);
+  });
+}
+
+function selectCat(c,btn){
+  CAT=c;
+  document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  apply();
+}
+
+function apply(){
+  let arr=DATA.filter(it=>(it.stock||0)<=MIN_STOCK);
+
+  if(CAT!=="ALL")
+    arr=arr.filter(it=>norm(it.kategori)===norm(CAT));
+
+  render(arr);
+}
+
+function render(items){
+  const root=document.getElementById("listRoot");
+  root.innerHTML="";
+
+  if(!items.length){
+    root.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#777">Tidak ada data</div>';
+    return;
+  }
+
+  items.forEach(it=>{
+    let img=(it.foto&&it.foto!=="null")?it.foto:"assets/noimg.png";
+    let card=document.createElement("div");
+    card.className="g-item";
+    card.onclick=()=>location.href=`barang_detail.html?id=${it.id}`;
+    card.innerHTML=`
+      <img class="g-img" src="${esc(img)}">
+      <div class="g-name">${esc(it.nama)}</div>
+      <div class="g-stock">Stok: ${it.stock||0}</div>
+    `;
+    root.appendChild(card);
+  });
+}
+
+/* UPDATE TIME */
+function updateHeaderTime(){
+  const el=document.getElementById("headerTime");
+  const d=new Date();
+  el.textContent=
+    d.toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"})+
+    " • "+
+    d.getHours().toString().padStart(2,"0")+"."+
+    d.getMinutes().toString().padStart(2,"0");
+}
+updateHeaderTime();
+setInterval(updateHeaderTime,1000);
+
+/* POPUP FILTER */
+btnAtur.onclick=()=>popup.style.display="flex";
+cancelMin.onclick=()=>popup.style.display="none";
+okMin.onclick=()=>{
+  MIN_STOCK=parseInt(minInput.value||"0");
+  popup.style.display="none";
+  apply();
+};
+
+/* RESET */
+btnReset.onclick=()=>{
+  MIN_STOCK=0;
+  minInput.value="";
+  apply();
+};
+
+/* FAB BACK */
+fabBack.onclick=()=>history.back();
+</script>
+
+<script src="/img-cache.js"></script>
+</body>
+</html>

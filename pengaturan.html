@@ -10,19 +10,19 @@
   --card:#fff;
   --bg:#f4f5f7;
   --muted:#6b7280;
+  --footer-soft:#d9e7ff;
 }
 
-/* BODY */
 body{
   margin:0;
-  padding-bottom:90px;
+  padding-bottom:60px; /* FIX: dari 90px → anti-scroll */
   background:var(--bg);
   font-family:Inter,Segoe UI,Roboto;
   color:#222;
 }
 *{-webkit-tap-highlight-color:transparent}
 
-/* HEADER kembali seperti semula, hanya warna teks yang diganti */
+/* HEADER */
 .header-wrap{position:relative;}
 .header{
   background:linear-gradient(90deg,#e8f0ff,#f3f7ff);
@@ -33,37 +33,26 @@ body{
   padding-right:90px;
 }
 .h-title{
-  font-size:18px;
-  font-weight:800;
-  color:#0A2A6B;
+  font-size:18px;font-weight:800;color:#1A6BFF;
 }
 .h-sub{
-  font-size:14px;
-  font-weight:600;
-  color:#0A2A6B;
-  margin-top:2px;
+  font-size:14px;font-weight:600;color:#1A6BFF;margin-top:2px;
 }
 .h-time{
-  font-size:13px;
-  color:#0A2A6B;
-  margin-top:6px;
+  font-size:13px;color:#1A6BFF;margin-top:6px;
 }
 .header-icon{
-  position:absolute;
-  right:14px;
-  top:50%;
-  transform:translateY(-50%);
-  width:60px;
-  height:auto;
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:60px;height:auto;
 }
 
 /* GRID */
 .grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:18px;
-  padding:0 16px;
-  margin-top:20px;
+  gap:10px;
+  padding:0 12px;
+  margin-top:10px;
 }
 .menu-item{
   background:var(--card);
@@ -83,6 +72,59 @@ body{
 }
 .menu-item:active{transform:scale(.98);}
 
+/* FULL-WIDTH BUTTON (KATALOG) */
+.full-btn{
+  margin:8px 12px 0; /* FIX: dari 14px → hilangkan scroll */
+  background:var(--card);
+  border-radius:18px;
+  padding:12px 16px;
+  display:flex;
+  flex-direction:row;
+  justify-content:center;
+  align-items:center;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+  cursor:pointer;
+  transition:transform .15s;
+}
+.full-btn img{
+  width:48px;height:48px;
+  object-fit:contain;
+  margin-right:12px;
+}
+.full-btn span{
+  font-size:15px;font-weight:700;color:#111;
+}
+.full-btn:active{transform:scale(.98);}
+
+/* bounce animation */
+.bounce{animation:bounceTap .25s ease-out}
+@keyframes bounceTap{
+  0%{transform:scale(1)}
+  40%{transform:scale(.92)}
+  100%{transform:scale(1)}
+}
+
+/* POPUP QR */
+#qrPopup{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);
+  display:none;justify-content:center;align-items:center;z-index:9999;
+}
+
+/* FOOTER */
+.footer-note{
+  margin-top:10px; /* FIX */
+  text-align:center;
+  font-size:12px;
+  padding-bottom:20px; /* FIX: dari 60px → 20px */
+  color:#1A6BFF;
+  background:#d9e7ff;
+  padding:6px 0;       /* FIX: dari 8px → 6px */
+  font-style:italic;
+}
+.footer-note b{
+  font-weight:700;font-style:italic;
+}
+
 /* NAVBAR */
 .navbar{
   position:fixed;bottom:0;left:0;right:0;
@@ -96,9 +138,9 @@ body{
 }
 .nav-item{
   display:flex;flex-direction:column;align-items:center;
-  font-size:11px;font-weight:600;
+  font-size:11px;font-weight:600;color:#6a6a6a;
   padding:6px 12px;border-radius:16px;
-  cursor:pointer;color:#6a6a6a;transition:.15s;
+  cursor:pointer;transition:.15s;
 }
 .nav-item img{
   width:28px;height:28px;margin-bottom:4px;opacity:.65;
@@ -106,30 +148,6 @@ body{
 .nav-active{background:rgba(62,139,255,0.12);color:#3E8BFF!important;}
 .nav-active img{opacity:1!important;}
 
-.bounce{animation:bounceTap .25s ease-out}
-@keyframes bounceTap{0%{transform:scale(1)}40%{transform:scale(.92)}100%{transform:scale(1)}}
-
-/* POPUP QR */
-#qrPopup{
-  position:fixed;inset:0;background:rgba(0,0,0,.45);
-  display:none;justify-content:center;align-items:center;z-index:9999;
-}
-
-/* FOOTER — biru muda, italic, domain bold italic */
-.footer-note{
-  margin-top:40px;
-  text-align:center;
-  font-size:12px;
-  padding-bottom:60px;
-  color:#0A2A6B;
-  background:#bcd4ff;
-  padding:14px 0;
-  font-style:italic;
-}
-.footer-note b{
-  font-weight:700;
-  font-style:italic;
-}
 </style>
 </head>
 
@@ -140,16 +158,13 @@ const token = localStorage.getItem("token");
 if(!token) location.href="index.html";
 
 function bounceThenNavigate(el,url){
-  if(el){el.classList.add("bounce");setTimeout(()=>el.classList.remove("bounce"),280);}
+  if(el){ el.classList.add("bounce"); setTimeout(()=>el.classList.remove("bounce"),280); }
   setTimeout(()=>location.href=url,90);
 }
 
 function doLogout(el){
-  if(el){el.classList.add("bounce");setTimeout(()=>el.classList.remove("bounce"),280);}
-  setTimeout(()=>{
-    localStorage.clear();
-    location.href="index.html";
-  },90);
+  if(el){ el.classList.add("bounce"); setTimeout(()=>el.classList.remove("bounce"),280); }
+  setTimeout(()=>{ localStorage.clear(); location.href="index.html"; },90);
 }
 
 function updateHeaderTime(){
@@ -179,58 +194,51 @@ function showQR(){
   </div>
 </div>
 
-<!-- GRID ATAS -->
+<!-- GRID -->
 <div class="grid">
 
-  <!-- Katalog -->
-  <div class="menu-item" onclick="bounceThenNavigate(this,'list_katalog.html')">
-    <img src="assets/katalog.png"><span>Katalog</span>
+  <div class="menu-item" onclick="bounceThenNavigate(this,'stok_kosong.html')">
+    <img src="assets/stok_kosong.png"><span>Cek Stock</span>
   </div>
 
-  <!-- Absensi -->
   <div class="menu-item" onclick="bounceThenNavigate(this,'absen.html')">
     <img src="assets/absen.png"><span>Absensi</span>
   </div>
 
-  <!-- Akun -->
   <div class="menu-item" onclick="bounceThenNavigate(this,'user.html')">
     <img src="assets/user.png"><span>Akun</span>
   </div>
 
-  <!-- GRID TENGAH -->
-
-  <!-- Invoice -->
   <div class="menu-item" onclick="bounceThenNavigate(this,'invoice.html')">
     <img src="assets/invoice.png"><span>Invoice</span>
   </div>
 
-  <!-- Harga ⇅ -->
   <div class="menu-item" onclick="bounceThenNavigate(this,'harga.html')">
     <img src="assets/harga2.png"><span>Harga ⇅</span>
   </div>
 
-  <!-- Bonus -->
   <div class="menu-item" onclick="bounceThenNavigate(this,'bonus.html')">
     <img src="assets/bonus.png"><span>Bonus</span>
   </div>
 
-  <!-- GRID BAWAH -->
-
-  <!-- Daily -->
   <div class="menu-item" onclick="bounceThenNavigate(this,'laporan_harian.html')">
-    <img src="assets/daily.png"><span>Daily</span>
+    <img src="assets/daily.png"><span>Rekap</span>
   </div>
 
-  <!-- QR Code -->
   <div class="menu-item" onclick="showQR()">
-    <img src="assets/qrcode.png"><span>QR Code</span>
+    <img src="assets/qrcode.png"><span>Show QR</span>
   </div>
 
-  <!-- Logout -->
   <div class="menu-item" onclick="doLogout(this)">
     <img src="assets/logout.png"><span>Logout</span>
   </div>
 
+</div>
+
+<!-- FULL-WIDTH KATALOG -->
+<div class="full-btn" onclick="bounceThenNavigate(this,'list_katalog.html')">
+  <img src="assets/katalog.png">
+  <span>Lihat atau Buat Katalog</span>
 </div>
 
 <!-- POPUP QR -->
