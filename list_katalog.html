@@ -7,56 +7,29 @@
 
 <style>
 html, body{
-  margin:0;
-  padding:0;
+  margin:0; padding:0;
   background:#f4f4f4;
   font-family:Inter, Arial, sans-serif;
   overflow-x:hidden;
 }
 
-/* ======================
-   HEADER (SAMA SEPERTI katalog.html)
-   ====================== */
+/* HEADER */
 .header-wrap{ position:relative; }
-
 .header{
   background:linear-gradient(90deg,#e8f0ff,#f3f7ff);
-  padding:14px 16px;
-  padding-right:90px;
+  padding:14px 16px; padding-right:90px;
   border-bottom:1px solid #e6eefc;
-  position:sticky; top:0;
-  z-index:20;
+  position:sticky; top:0; z-index:20;
 }
-
 .header-icon{
-  position:absolute;
-  right:14px;
-  top:50%;
-  transform:translateY(-50%);
-  width:54px;
+  position:absolute; right:14px; top:50%;
+  transform:translateY(-50%); width:54px;
 }
+.h-title{ font-size:18px; font-weight:800; }
+.h-sub{ font-size:14px; font-weight:600; color:#666; margin-top:2px; }
+.h-web{ font-size:13px; color:#666; margin-top:4px; }
 
-.h-title{
-  font-size:18px;
-  font-weight:800;
-}
-
-.h-sub{
-  font-size:14px;
-  font-weight:600;
-  color:#666;
-  margin-top:2px;
-}
-
-.h-web{
-  font-size:13px;
-  color:#666;
-  margin-top:4px;
-}
-
-/* ======================
-   CARD LIST
-   ====================== */
+/* CONTENT LIST */
 .list{ padding:14px; }
 
 .card{
@@ -65,56 +38,93 @@ html, body{
   padding:14px;
   margin-bottom:12px;
   box-shadow:0 2px 8px rgba(0,0,0,0.12);
-  width:100%;
-  box-sizing:border-box;
-  position:relative;
+  transition:background .8s ease;
 }
 
-.katalogID{
+/* TOP BAR */
+.card-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.katalogName{
   font-size:16px;
   font-weight:800;
   color:#1e88e5;
+  display:flex; align-items:center; gap:6px;
+}
+
+.pencil{ width:16px; opacity:.7; cursor:pointer; }
+
+.katalogDate{ font-size:13px; color:#666; }
+
+/* URL ROW */
+.urlRow{
+  display:flex; align-items:center;
+  gap:8px; margin-bottom:14px;
+}
+
+.urlBox{
+  flex:1;
+  background:#f6f6f6;
+  border:1px solid #ccc;
+  border-radius:6px;
+  padding:6px 8px;
+  font-size:13px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.copySmall{
+  background:#2196f3;
+  color:white;
+  border:none;
+  border-radius:6px;
+  padding:6px 10px;
+  font-size:13px;
+  display:flex; align-items:center; gap:6px;
+}
+
+/* ACTION ROW */
+.actionRow{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+}
+
+.btnAction{
+  border:none;
+  border-radius:6px;
+  padding:8px 10px;
+  font-size:14px;
   display:flex;
   align-items:center;
   gap:6px;
-}
-
-.pencil{
-  width:16px;
-  opacity:0.7;
-}
-
-.date{
-  font-size:13px;
-  color:#666;
-  margin-top:6px;
-}
-
-.actions{
-  display:flex;
-  gap:10px;
-  margin-top:12px;
-}
-
-.btn{
-  flex:1;
-  padding:10px 0;
-  font-size:14px;
-  border:none;
-  border-radius:6px;
-  color:white;
   cursor:pointer;
 }
 
-.copyBtn{ background:#2196f3; }
-.delBtn { background:#d32f2f; }
+.viewBtn{ background:#e3f2fd; color:#2196f3; }
+.shareBtn{ background:#4caf50; color:white; }
 
-/* ======================
-   FAB
-   ====================== */
+/* DELETE BUTTON FIX CENTER */
+.delBtn{
+  background:#d32f2f;
+  color:white;
+  width:40px;
+  height:40px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:6px;
+}
+
+/* FAB */
 .fabAdd{
-  position:fixed;
-  bottom:22px; right:22px;
+  position:fixed; bottom:22px; right:22px;
   width:58px; height:58px;
   background:#1e88e5; color:white;
   border:none; border-radius:50%;
@@ -124,9 +134,8 @@ html, body{
   z-index:200;
 }
 
-.fabHome{
-  position:fixed;
-  bottom:22px; left:22px;
+.fabBack{
+  position:fixed; bottom:22px; left:22px;
   width:58px; height:58px;
   background:#fffff;
   border:none; border-radius:50%;
@@ -134,24 +143,18 @@ html, body{
   box-shadow:0 4px 12px rgba(0,0,0,0.28);
   z-index:200;
 }
-.fabHome img{
-  width:28px; height:28px;
-}
+.fabBack img{ width:28px; height:28px; }
 
-/* ======================
-   TOAST
-   ====================== */
+/* TOAST */
 .toast{
   position:fixed;
   bottom:22px; left:50%;
   transform:translateX(-50%) translateY(20px);
   background:rgba(33,150,243,0.92);
-  backdrop-filter:blur(6px);
-  padding:12px 18px; color:white;
-  border-radius:10px;
+  padding:12px 18px;
+  color:white; border-radius:10px;
   font-size:14px;
-  opacity:0;
-  transition:all .35s ease;
+  opacity:0; transition:.3s;
   z-index:300;
 }
 .toast.show{
@@ -159,15 +162,11 @@ html, body{
   transform:translateX(-50%) translateY(0);
 }
 
-/* ======================
-   POPUP RENAME
-   ====================== */
+/* POPUP */
 .popup-bg{
   position:fixed; inset:0;
   background:rgba(0,0,0,0.35);
-  display:none;
-  justify-content:center;
-  align-items:center;
+  display:none; justify-content:center; align-items:center;
   z-index:400;
 }
 
@@ -177,41 +176,37 @@ html, body{
   max-width:330px;
   border-radius:14px;
   padding:16px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.25);
+  box-sizing:border-box;      /* FIX */
 }
 
-.pop-title{
-  font-size:17px;
-  font-weight:700;
-  margin-bottom:10px;
-}
+.pop-title{ font-size:17px; font-weight:700; margin-bottom:10px; }
 
 .pop-input{
   width:100%;
+  max-width:100%;             /* FIX */
+  box-sizing:border-box;      /* FIX */
   padding:10px;
   border:1px solid #ccc;
   border-radius:8px;
-  font-size:15px;
-  box-sizing:border-box; /* FIX WIDTH */
+  margin-bottom:14px;
 }
 
-.pop-actions{
-  display:flex;
-  gap:10px;
-  margin-top:14px;
-}
-
+.pop-actions{ display:flex; gap:10px; }
 .pop-btn{
-  flex:1;
-  padding:10px 0;
-  border:none;
-  border-radius:8px;
-  font-size:15px;
-  font-weight:700;
+  flex:1; padding:10px 0;
+  border:none; border-radius:8px;
+  font-size:15px; font-weight:700;
 }
-
 .pop-cancel{ background:#ccc; }
-.pop-save  { background:#1e88e5; color:white; }
+.pop-save{ background:#1e88e5; color:white; }
+.pop-delete{ background:#d32f2f; color:white; }
+
+/* HIGHLIGHT */
+.flash-card{ animation:flashAnim 1.6s ease-out; }
+@keyframes flashAnim{
+  0%{background:#fff7c4;}
+  100%{background:white;}
+}
 </style>
 </head>
 
@@ -229,21 +224,18 @@ html, body{
 
 <div id="list" class="list">Memuat...</div>
 
-<!-- FAB ADD -->
 <button class="fabAdd" onclick="location.href='buat_katalog.html'">+</button>
-
-<!-- FAB HOME -->
-<button class="fabHome" onclick="location.href='home.html'">
-  <img src="assets/beranda.png">
+<button class="fabBack" onclick="history.back()">
+  <img src="assets/back_white.png">
 </button>
 
 <div id="toast" class="toast"></div>
 
-<!-- POPUP -->
+<!-- POPUP RENAME -->
 <div id="popupBg" class="popup-bg">
   <div class="popup">
     <div class="pop-title">Rename Katalog</div>
-    <input id="renameInput" class="pop-input" placeholder="Nama katalog (opsional)">
+    <input id="renameInput" class="pop-input" placeholder="Nama katalog">
     <div class="pop-actions">
       <button class="pop-btn pop-cancel" onclick="closePopup()">Batal</button>
       <button class="pop-btn pop-save" onclick="saveRename()">Simpan</button>
@@ -251,120 +243,199 @@ html, body{
   </div>
 </div>
 
+<!-- POPUP DELETE -->
+<div id="deletePopup" class="popup-bg">
+  <div class="popup">
+    <div class="pop-title">Hapus Katalog?</div>
+    <div style="font-size:14px; color:#555; margin-bottom:12px;">Katalog akan dihapus permanen.</div>
+    <div class="pop-actions">
+      <button class="pop-btn pop-cancel" onclick="closeDelete()">Batal</button>
+      <button class="pop-btn pop-delete" onclick="confirmDelete()">Hapus</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const API = "https://msg.wendyrenzya.workers.dev";
-let renameID = "";
+const API="https://msg.wendyrenzya.workers.dev";
+let renameID="", deleteID="";
 
 /* Toast */
 function toast(msg){
   const t=document.getElementById("toast");
   t.innerText=msg;
   t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),1800);
+  setTimeout(()=>t.classList.remove("show"),1500);
 }
 
-/* Popup */
+/* NORMALISASI — Katalog-123 → 123 */
+function shortID(id){
+  return id.replace("Katalog-","");
+}
+
+/* RENAME POPUP */
 function openPopup(ev,id){
   ev.stopPropagation();
-  renameID = id;
-  document.getElementById("renameInput").value = "";
+  renameID=id;
+  document.getElementById("renameInput").value="";
   document.getElementById("popupBg").style.display="flex";
 }
 function closePopup(){
   document.getElementById("popupBg").style.display="none";
 }
-
-/* Save rename */
 async function saveRename(){
-  const name = document.getElementById("renameInput").value.trim();
-
-  const r = await fetch(API + "/api/katalog_name/" + renameID,{
+  const name=document.getElementById("renameInput").value.trim();
+  await fetch(API+"/api/katalog_name/"+renameID,{
     method:"PUT",
     headers:{ "Content-Type":"application/json" },
     body:JSON.stringify({ nama_katalog:name })
   });
-
-  let j={}; try{ j = await r.json(); }catch{}
-
-  if(!j.ok) return toast("Gagal menyimpan");
-
-  toast("Nama disimpan");
   closePopup();
   loadList();
 }
 
-/* Copy URL */
-function copyURL(id, ev){
+/* DELETE POPUP */
+function openDelete(ev,id){
   ev.stopPropagation();
-
-  const base = "https://bigmotor.web.id";
-  const fullURL = base + "/katalog.html?id_katalog=" + id;
-
-  navigator.clipboard.writeText(fullURL);
-  toast("URL disalin");
+  deleteID=id;
+  document.getElementById("deletePopup").style.display="flex";
 }
-
-/* Delete */
-async function deleteKatalog(id,ev){
-  ev.stopPropagation();
-  if(!confirm("Hapus katalog "+id+"?")) return;
-
-  const r = await fetch(API + "/api/katalog/" + id,{method:"DELETE"});
-  let j={}; try{ j=await r.json(); }catch{}
-
-  if(!j.ok) return toast("Gagal menghapus");
-
-  toast("Katalog dihapus");
+function closeDelete(){
+  document.getElementById("deletePopup").style.display="none";
+}
+async function confirmDelete(){
+  await fetch(API+"/api/katalog/"+deleteID,{method:"DELETE"});
+  closeDelete();
   loadList();
 }
 
-/* Load list */
+/* COPY */
+function copyURL(id,ev){
+  ev.stopPropagation();
+  const sid = shortID(id);
+  const url = "https://bigmotor.web.id/katalog.html?id=" + sid;
+  navigator.clipboard.writeText(url);
+  toast("URL disalin");
+}
+
+/* SHARE */
+function shareKatalog(id,ev){
+  ev.stopPropagation();
+  const sid = shortID(id);
+  const url="https://bigmotor.web.id/katalog.html?id=" + sid;
+
+  if(navigator.share){
+    navigator.share({
+      title:"Katalog BIG Motor",
+      text:"Lihat katalog ini:",
+      url:url
+    });
+  } else {
+    navigator.clipboard.writeText(url);
+    toast("Tautan disalin");
+  }
+}
+
+/* LOAD LIST */
 async function loadList(){
-  const container=document.getElementById("list");
-  container.innerHTML="Memuat...";
+  const wrap=document.getElementById("list");
+  wrap.innerHTML="Memuat...";
 
   let data;
   try{
-    const r=await fetch(API + "/api/katalog_list");
+    const r=await fetch(API+"/api/katalog_list");
     data=await r.json();
   }catch{
-    container.innerHTML="Gagal memuat data";
-    return;
+    wrap.innerHTML="Gagal memuat data"; return;
   }
 
   const items=data.items||[];
   if(!items.length){
-    container.innerHTML="Tidak ada katalog";
+    wrap.innerHTML="Tidak ada katalog"; 
     return;
   }
 
-  container.innerHTML="";
+  wrap.innerHTML="";
 
   items.forEach(row=>{
-    const id=row.id_katalog;
-    const name = row.nama_katalog?.trim() ? row.nama_katalog : id;
-    const url="katalog.html?id_katalog="+id;
+    const id=row.id_katalog;       
+    const sid=shortID(id);         
+    const name=row.nama_katalog?.trim()?row.nama_katalog:id;
+    const fullURL="https://bigmotor.web.id/katalog.html?id="+sid;
+    const url="katalog.html?id="+sid;
 
     const div=document.createElement("div");
-    div.className="card";
-    div.addEventListener("click",()=>location.href=url);
+    div.className="card katalogCard";
+    div.dataset.id=id;
 
     div.innerHTML=`
-      <div class="katalogID">
-        ${name}
-        <img src="assets/pencil.png" class="pencil" onclick="openPopup(event,'${id}')">
+
+      <div class="card-top">
+        <div class="katalogName">
+          ${name}
+          <img src="assets/pencil.png" class="pencil" onclick="openPopup(event,'${id}')">
+        </div>
+        <div class="katalogDate">${row.created_at||""}</div>
       </div>
 
-      <div class="date">${row.created_at||""}</div>
+      <div class="urlRow">
+        <div class="urlBox">${fullURL}</div>
+        <button class="copySmall" onclick="copyURL('${id}',event)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 
+                    0-2 .9-2 2v14c0 1.1.9 2 2 
+                    2h11c1.1 0 2-.9 
+                    2-2V7c0-1.1-.9-2-2-2zm0 
+                    16H8V7h11v14z"/>
+          </svg>
+        </button>
+      </div>
 
-      <div class="actions">
-        <button class="btn copyBtn" onclick="copyURL('${id}',event)">Copy URL</button>
-        <button class="btn delBtn" onclick="deleteKatalog('${id}',event)">Hapus</button>
+      <div class="actionRow">
+
+        <!-- VIEW (ikon mata) -->
+        <button class="btnAction viewBtn" onclick="location.href='${url}'; event.stopPropagation()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#2196f3">
+            <path d="M12 4.5C5 4.5 1.5 12 1.5 12s3.5 7.5 10.5 7.5S23.5 12 23.5 12 19 4.5 12 4.5zm0 12a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-7a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/>
+          </svg>
+        </button>
+
+        <!-- SHARE -->
+        <button class="btnAction shareBtn" onclick="shareKatalog('${id}',event)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 
+                     12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.12-4.17A2.99 
+                     2.99 0 0018 7.91a3 3 0 10-3-3c0 
+                     .24.04.47.09.7L7.97 9.64A3.02 3.02 
+                     0 005 9a3 3 0 100 6c1.11 0 
+                     2.09-.6 2.61-1.48l7.22 4.17c-.05.21-.08.43-.08.65a3 
+                     3 0 103-3z"/>
+          </svg>
+        </button>
+
+        <!-- DELETE -->
+        <button class="btnAction delBtn" onclick="openDelete(event,'${id}')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+            <path d="M6 7h12v12a2 2 0 01-2 2H8a2 2 0 01-2-2V7zm3-3h6l1 1h4v2H4V5h4l1-1z"/>
+          </svg>
+        </button>
+
       </div>
     `;
 
-    container.appendChild(div);
+    div.addEventListener("click",()=>location.href=url);
+    wrap.appendChild(div);
   });
+
+  /* HIGHLIGHT */
+  const fID=sessionStorage.getItem("flash_katalog_id");
+  if(fID){
+    const el=document.querySelector(`.katalogCard[data-id="${fID}"]`);
+    if(el){
+      el.classList.add("flash-card");
+      setTimeout(()=>el.classList.remove("flash-card"),1800);
+    }
+    sessionStorage.removeItem("flash_katalog_id");
+  }
 }
 
 loadList();

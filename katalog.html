@@ -49,7 +49,7 @@ body{
 /* ===== CHECKOUT BAR ===== */
 .checkout-bar{
   position:sticky;
-  top:94px;
+  top:80px;
   background:white;
   border-bottom:1px solid #e6eefc;
   padding:10px 14px;
@@ -212,8 +212,20 @@ function checkout(){
 
 /* DATA LOADING */
 async function run(){
-  const p = new URLSearchParams(location.search);
-  const id = p.get("id_katalog");
+  /* ============================
+   NORMALISASI PARAMETER ID
+   ============================ */
+const p = new URLSearchParams(location.search);
+let id = p.get("id");
+
+/* Jika URL memakai format pendek (angka saja), ubah jadi Katalog-xxx */
+if(id){
+  if(!id.startsWith("Katalog-")){
+    id = "Katalog-" + id;
+  }
+} else {
+  document.getElementById("katalogTitle").innerText="ID tidak valid";
+}
 
   if (!id) {
     document.body.innerHTML = "<h3>ID katalog tidak ditemukan</h3>";

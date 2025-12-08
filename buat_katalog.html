@@ -6,162 +6,335 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-/* --- GLOBAL --- */
+/* =============== GLOBAL WRAPPER FIX =============== */
 html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
+  overflow: hidden; /* body TIDAK scroll */
   font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  overflow-x: hidden;      /* KUNCI UTAMA */
-  max-width: 100%;         /* KUNCI */
+  background:#f4f4f4;
 }
 
-/* --- SEARCH BOX --- */
-.searchBox {
+/* SCROLL ROOT */
+.scrollWrap {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  background:#f4f4f4;
+}
+
+/* =============== STICKY HEADER =============== */
+.stickyHeader {
   position: sticky;
   top: 0;
-  background: white;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  z-index: 20;
+  z-index: 999;
+  background:white;
+  padding:10px;
+  padding-bottom:12px;
+  border-bottom:1px solid #ddd;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
 }
-.searchBox input {
+
+/* SEARCH INPUT */
+.stickyHeader input {
   width: 100%;
-  box-sizing: border-box;  /* KUNCI AGAR TIDAK MELEBAR */
   padding: 10px 12px;
   font-size: 15px;
   border: 2px solid #2196f3;
   border-radius: 8px;
+  box-sizing: border-box;
+
+  autocomplete: off;
 }
 
-/* --- ITEM ROW --- */
+/* FILTER ROW */
+.filterRow {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:8px;
+}
+
+/* PILIH SEMUA NATURAL */
+.pickAllBox {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:14px;
+  color:#333;
+}
+
+.pickAllBox input {
+  width:20px;
+  height:20px;
+}
+
+/* BUTTON KATEGORI */
+.filterBtn {
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid #2196f3;
+  background:white;
+  color:#2196f3;
+  font-size:14px;
+}
+
+/* BUTTON RESET */
+.resetBtn {
+  padding:8px 12px;
+  border-radius:10px;
+  background:#ffe0e0;
+  border:1px solid #ffbaba;
+  color:#b40000;
+  font-size:14px;
+}
+
+/* =============== LIST ITEM =============== */
+#list { margin-top:8px; }
+
 .item {
-  display: flex;
-  align-items: center;
-  background: white;
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-
-  width: 100%;
-  box-sizing: border-box;   /* ANTI LEBAR LAYAR */
-  overflow: hidden;
-  gap: 10px;
+  display:flex;
+  align-items:center;
+  background:white;
+  padding:10px;
+  border-bottom:1px solid #eee;
+  gap:10px;
 }
 
-/* --- FOTO KIRI (diperkecil sedikit agar muat HP kecil) --- */
-.item img {
-  width: 54px;
-  height: 54px;
-  object-fit: cover;
-  border-radius: 6px;
-  flex-shrink: 0;           /* Biar tidak menekan teks */
-}
+.item.checked { background:#e3f2fd; }
 
-/* --- CHECKBOX BESAR --- */
 .item input[type=checkbox] {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;           /* Jangan melebar */
+  width:20px;
+  height:20px;
 }
 
-/* --- TEXT CONTAINER --- */
-.item .textBox {
-  flex: 1;                  /* Supaya sisa area dipakai teks */
-  min-width: 0;             /* TANPA INI SCROLL HORIZONTAL MUNCUL */
+.item img {
+  width:54px;
+  height:54px;
+  border-radius:6px;
+  object-fit:cover;
 }
 
-/* --- TEXT --- */
-.name { font-size: 15px; font-weight: bold; white-space: normal; }
-.price { font-size: 14px; color: #d20000; margin-top: 2px; }
-.stock { font-size: 12px; color: #666; margin-top: 2px; }
+.textBox { flex:1; min-width:0; }
+.name { font-size:15px; font-weight:bold; }
+.price { font-size:14px; color:#d20000; margin-top:2px; }
+.stock { font-size:12px; color:#666; margin-top:2px; }
+.highlight { color:#007bff; font-weight:bold; }
 
-/* --- HIGHLIGHT SEARCH --- */
-.highlight { color: #007bff; font-weight: bold; }
-
-/* --- FLOATING BUTTON --- */
+/* BUTTON BUAT */
 #btnBuat {
-  position: fixed;
-  bottom: 18px;
-  right: 18px;
-  background: #1E88E5;
-  color: white;
-  padding: 14px 20px;
-  border-radius: 40px;
-  border: none;
-  font-size: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-  z-index: 50;
-  max-width: 80%;           /* ANTI LEWAT LAYAR */
-  box-sizing: border-box;
+  position:fixed;
+  bottom:18px;
+  right:18px;
+  background:#1E88E5;
+  color:white;
+  padding:14px 20px;
+  border-radius:40px;
+  border:none;
+  font-size:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+  z-index:1500;
 }
 
-/* --- TOAST --- */
+/* TOAST */
 .toast {
-  position: fixed;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #ff3b3b;
-  padding: 12px 18px;
-  color: white;
-  border-radius: 6px;
-  opacity: 0;
-  font-size: 14px;
-  transition: 0.3s;
-  z-index: 100;
-  max-width: 90%;
-  box-sizing: border-box;
+  position:fixed;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#ff3b3b;
+  padding:12px 18px;
+  color:white;
+  border-radius:6px;
+  opacity:0;
+  transition:0.3s;
+  font-size:14px;
+  z-index:2000;
 }
-.toast.show { opacity: 1; }
+.toast.show { opacity:1; }
+
+/* =============== POPUP FILTER =============== */
+#filterPopup {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.3);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:3000;
+}
+
+#filterPopup .box {
+  background:white;
+  padding:16px;
+  border-radius:14px;
+  width:80%;
+  max-width:320px;
+}
+
+.filterCard {
+  padding:10px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.filterCard.active {
+  border-color:#1e88e5;
+  background:#e3f2fd;
+}
+
+.catItem { display:flex; gap:10px; align-items:center; }
+
+/* =============== POPUP NAMA KATALOG =============== */
+#namePopup {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.3);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:3000;
+}
+
+#namePopup .box {
+  background:white;
+  padding:16px;
+  border-radius:14px;
+  width:80%;
+  max-width:300px;
+}
+
+#namePopup input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 14px;
+
+  /* Tambahan untuk mencegah overflow Android */
+  min-width: 0;
+  overflow: hidden;
+}
 </style>
 </head>
 
 <body>
 
-<div class="searchBox">
-  <input type="text" id="search" placeholder="Cari barang…">
+<div class="scrollWrap">
+
+  <!-- ================== STICKY HEADER ================== -->
+  <div class="stickyHeader">
+
+    <input 
+      id="search"
+      type="text"
+      placeholder="Cari barang…" 
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false">
+
+    <div class="filterRow">
+
+      <label class="pickAllBox">
+        <input type="checkbox" id="pickAll" onchange="togglePickAll()">
+        Pilih semua
+      </label>
+
+      <button class="filterBtn" onclick="openFilter()">Kategori</button>
+
+      <button class="resetBtn" onclick="resetAll()">Reset</button>
+
+    </div>
+  </div>
+
+  <!-- ================== LIST ================== -->
+  <div id="list"></div>
+
 </div>
 
-<div id="list"></div>
-
 <button id="btnBuat">Buat Katalog</button>
+<div id="toast" class="toast"></div>
 
-<div id="toast" class="toast">Gagal membuat katalog</div>
+<!-- ================== FILTER POPUP ================== -->
+<div id="filterPopup">
+  <div class="box">
+    <div style="font-weight:bold; margin-bottom:10px; font-size:16px;">Filter Kategori</div>
+    <div id="filterList" style="max-height:260px; overflow:auto; margin-bottom:12px;"></div>
+    <button onclick="applyFilter()" style="
+      width:100%; padding:10px; 
+      background:#1e88e5; color:white; border:none; border-radius:10px;">
+      Terapkan
+    </button>
+  </div>
+</div>
+
+<!-- ================== NAMA KATALOG POPUP ================== -->
+<div id="namePopup">
+  <div class="box">
+    <div style="font-weight:bold; margin-bottom:10px; font-size:16px;">Nama Katalog</div>
+
+    <input id="namaKatalog" placeholder="Nama katalog…">
+
+    <div style="display:flex; gap:10px;">
+      <button onclick="closeNamePopup()" style="
+        flex:1; padding:10px; background:#ccc; border:none; border-radius:10px;">
+        Batal
+      </button>
+
+      <button onclick="submitKatalog()" style="
+        flex:1; padding:10px; background:#1e88e5; color:white; border:none; border-radius:10px;">
+        Simpan
+      </button>
+    </div>
+  </div>
+</div>
 
 <script>
 const API_BARANG  = "https://api.bigmotor.biz.id";
 const API_KATALOG = "https://msg.wendyrenzya.workers.dev";
 
 let dataBarang = [];
+let kategoriList = [];
+let filterAktif = [];
 
-/* Toast */
-function showToast(txt) {
+/* ---------------- TOAST ---------------- */
+function showToast(txt){
   const t = document.getElementById("toast");
   t.innerText = txt;
   t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2000);
+  setTimeout(()=>t.classList.remove("show"),1500);
 }
 
-/* Highlight fuzzy */
-function hl(text, key) {
-  if (!key) return text;
-  const re = new RegExp("(" + key + ")", "gi");
-  return text.replace(re, `<span class="highlight">$1</span>`);
+/* ---------------- Highlight ---------------- */
+function hl(text,key){
+  if(!key) return text;
+  return text.replace(new RegExp("("+key+")","gi"), "<span class='highlight'>$1</span>");
 }
 
-/* Render list */
-function renderList(key="") {
+/* ---------------- RENDER LIST ---------------- */
+function renderList(key=""){
   const list = document.getElementById("list");
   list.innerHTML = "";
   key = key.toLowerCase().trim();
 
-  dataBarang.forEach(b => {
-    const match =
+  dataBarang.forEach(b=>{
+    const cocok =
       b.nama.toLowerCase().includes(key) ||
-      String(b.harga).includes(key) ||
-      String(b.stock).includes(key);
+      (""+b.harga).includes(key) ||
+      (""+b.stock).includes(key);
 
-    if (!match) return;
+    if(!cocok) return;
+
+    const kategori = b.kategori || "Tidak ada kategori";
+    if(filterAktif.length>0 && !filterAktif.includes(kategori)) return;
 
     const row = document.createElement("div");
     row.className = "item";
@@ -170,54 +343,141 @@ function renderList(key="") {
       <input type="checkbox" value="${b.id}">
       <img src="${b.foto || ''}" onerror="this.src='assets/noimg.png'">
       <div class="textBox">
-        <div class="name">${hl(b.nama, key)}</div>
+        <div class="name">${hl(b.nama,key)}</div>
         <div class="price">Rp${b.harga}</div>
         <div class="stock">Stok: ${b.stock}</div>
       </div>
     `;
 
+    const cb = row.querySelector("input");
+    cb.addEventListener("change",()=> row.classList.toggle("checked",cb.checked));
+
     list.appendChild(row);
   });
 }
 
-/* Load barang */
-async function loadBarang() {
-  const r = await fetch(API_BARANG + "/api/barang");
+/* ---------------- LOAD DATA ---------------- */
+async function loadBarang(){
+  const r = await fetch(API_BARANG+"/api/barang");
   const j = await r.json();
   dataBarang = j.items || [];
+  ambilKategori();
   renderList("");
 }
 
-/* Search */
-document.getElementById("search").addEventListener("input", e => {
+/* ---------------- CATEGORY ---------------- */
+function ambilKategori(){
+  const s = new Set();
+  dataBarang.forEach(b=> s.add(b.kategori || "Tidak ada kategori"));
+  kategoriList = [...s];
+}
+
+function openFilter(){
+  ambilKategori();
+  const box = document.getElementById("filterList");
+  box.innerHTML = "";
+
+  kategoriList.forEach(k=>{
+    const aktif = filterAktif.includes(k);
+
+    const div = document.createElement("div");
+    div.className = "filterCard "+(aktif?"active":"" );
+
+    div.innerHTML = `
+      <label class="catItem">
+        <input type="checkbox" value="${k}" ${aktif?"checked":""}>
+        <span>${k}</span>
+      </label>
+    `;
+
+    div.querySelector("input").addEventListener("change", e=>{
+      div.classList.toggle("active", e.target.checked);
+    });
+
+    box.appendChild(div);
+  });
+
+  document.getElementById("filterPopup").style.display="flex";
+}
+
+/* ---------------- APPLY FILTER ---------------- */
+function applyFilter(){
+  filterAktif =
+    [...document.querySelectorAll("#filterList input[type=checkbox]:checked")]
+    .map(x=>x.value);
+
+  document.getElementById("filterPopup").style.display="none";
+  renderList(document.getElementById("search").value);
+}
+
+/* ---------------- RESET ---------------- */
+function resetAll(){
+  filterAktif = [];
+  document.getElementById("pickAll").checked = false;
+
+  document.querySelectorAll("#list .item").forEach(it=>{
+    const cb = it.querySelector("input");
+    cb.checked = false;
+    it.classList.remove("checked");
+  });
+
+  renderList(document.getElementById("search").value);
+}
+
+/* ---------------- PILIH SEMUA ---------------- */
+function togglePickAll(){
+  const st = document.getElementById("pickAll").checked;
+
+  document.querySelectorAll("#list .item").forEach(it=>{
+    const cb = it.querySelector("input");
+    cb.checked = st;
+    it.classList.toggle("checked", st);
+  });
+}
+
+/* ---------------- SEARCH ---------------- */
+document.getElementById("search").addEventListener("input", e=>{
   renderList(e.target.value);
 });
 
-/* Submit katalog */
-document.getElementById("btnBuat").onclick = async () => {
-  const ids = [...document.querySelectorAll("input[type=checkbox]:checked")]
-              .map(x => Number(x.value));
+/* ---------------- POPUP NAMA ---------------- */
+document.getElementById("btnBuat").onclick = ()=>{
+  const cek = [...document.querySelectorAll("#list input[type=checkbox]:checked")];
+  if(!cek.length) return showToast("Belum ada barang dipilih");
 
-  if (!ids.length) return showToast("Tidak ada barang dipilih");
+  document.getElementById("namePopup").style.display="flex";
+};
+
+function closeNamePopup(){
+  document.getElementById("namePopup").style.display="none";
+}
+
+/* ---------------- SIMPAN KATALOG ---------------- */
+async function submitKatalog(){
+  const nama = document.getElementById("namaKatalog").value.trim();
+  if(!nama) return showToast("Nama katalog wajib diisi");
+
+  const ids = [...document.querySelectorAll("#list input[type=checkbox]:checked")]
+              .map(x=>Number(x.value));
 
   let res;
-  try {
-    res = await fetch(API_KATALOG + "/api/katalog", {
-      method: "POST",
-      headers: { "Content-Type":"application/json" },
-      body: JSON.stringify({ items: ids })
+  try{
+    res = await fetch(API_KATALOG+"/api/katalog",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json"},
+      body:JSON.stringify({ items:ids, nama_katalog:nama })
     });
-  } catch {
+  }catch{
     return showToast("Gagal terhubung");
   }
 
-  let j = {};
-  try { j = await res.json(); } catch {}
+  const j = await res.json();
+  if(!j.id_katalog) return showToast("Gagal membuat katalog");
 
-  if (!j.id_katalog) return showToast("Gagal membuat katalog");
+  sessionStorage.setItem("flash_katalog_id", j.id_katalog);
 
-  location.href = "katalog.html?id_katalog=" + j.id_katalog;
-};
+  location.href = "list_katalog.html";
+}
 
 loadBarang();
 </script>

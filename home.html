@@ -15,6 +15,35 @@
   box-shadow:0 2px 8px rgba(0,0,0,0.14);
 }
 
+.custom-info-card, .sticky-card {
+  transition: transform .12s ease;
+}
+.custom-info-card:active,
+.sticky-card:active {
+  transform: scale(0.96);
+}
+
+.price-card {
+  transition: transform .12s ease;
+}
+.price-card:active {
+  transform: scale(0.96);
+}
+
+.menu-item {
+  transition: transform .12s ease;
+}
+.menu-item:active {
+  transform: scale(0.92);
+}
+.custom-info-card, .sticky-card {
+  transition: transform .12s ease;
+}
+.custom-info-card:active,
+.sticky-card:active {
+  transform: scale(0.96);
+}
+
 /* HEADER WRAP */
 .header-wrap{
   position:sticky;
@@ -512,6 +541,18 @@ align-items:center;justify-content:center;">
     </div>
   </div>
 </div>
+<script>
+const grid = document.querySelector('.grid');
+const topPos = grid.offsetTop;
+
+window.addEventListener('scroll',()=>{
+  if(window.scrollY > topPos - 100){
+    grid.classList.add('stuck');
+  } else {
+    grid.classList.remove('stuck');
+  }
+});
+</script>
 
 </body>
 </html>
