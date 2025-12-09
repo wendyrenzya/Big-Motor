@@ -1,385 +1,369 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Struk 58mm – No Border</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Struk</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
-  body{
-    margin:0;
-    background:#f2f3f5;
-    font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-    color:#000;
-  }
+body{
+  margin:0;
+  font-family: Inter, Arial, sans-serif;
+  background:#f3f3f3;
+  padding:20px;
+}
 
-  .page{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding:20px;
-    gap:20px;
-  }
+/* WRAPPER STRUK */
+#wrap{
+  background:#fff;
+  padding:20px;
+  border-radius:10px;
+  max-width:420px;
+  margin:60px auto 0 auto;
+  box-shadow:0 3px 10px rgba(0,0,0,.15);
+}
+.center{text-align:center}
+.line{border-bottom:1px dashed #000;margin:10px 0}
+.title{font-weight:700;font-size:18px;margin-top:10px;text-align:center}
+.item-row{
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px dashed #ddd;
+  font-size:14px;
+}
+.label{font-weight:700}
 
-  .controls{
-    width:100%;
-    max-width:520px;
-    display:flex;
-    gap:10px;
-  }
+/* TOP BUTTONS AREA */
+#topBar{
+  position:fixed;
+  top:10px; left:0; right:0;
+  display:flex;
+  flex-direction:row;
+  justify-content:flex-end;
+  align-items:center;
+  gap:10px;
+  padding:0 12px;
+  z-index:9999;
+}
 
-  .btn{
-    flex:1;
-    padding:12px;
-    border-radius:10px;
-    border:0;
-    font-weight:700;
-    cursor:pointer;
-    font-size:14px;
-  }
+/* TOMBOL TUTORIAL SEJAJAR X */
+#btnTutorialTop{
+  background:#ff8c42;
+  color:#fff;
+  font-weight:700;
+  font-size:13px;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  box-shadow:0 3px 6px rgba(0,0,0,0.18);
+  white-space:nowrap;
+  transition:transform .12s;
+}
+#btnTutorialTop:active{ transform:scale(0.92); }
 
-  .btn.primary{background:#000;color:#fff}
-  .btn.ghost{background:#fff;border:1px solid #bfbfbf}
-  .btn.warn{background:#e8e8e8}
+/* CLOSE BUTTON */
+#closeBtn{
+  background:#ff3b30;
+  color:#fff;
+  border:0;
+  border-radius:50%;
+  width:38px;height:38px;
+  font-size:20px;
+  font-weight:900;
+  cursor:pointer;
+}
 
-  .preview-wrap{
-    background:#fff;
-    padding:40px 34px;
-    border-radius:14px;
-    box-shadow:0 6px 16px rgba(0,0,0,0.12);
-  }
+.actionBar{
+  margin-top:20px;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:12px;
+}
 
-  /* KERTAS STRUK TANPA BORDER KIRI */
-  .paper{
-    width:384px;
-    margin:0 auto;
-    padding:0 20px; 
-    color:#000;
-    font-size:13px;
-    line-height:1.35;
-    filter:grayscale(100%);
-    font-family:"Courier New", monospace;
-  }
+.actionBtn{
+  flex:1 1 calc(25% - 12px);
+  border-radius:12px;
+  padding:12px 0 6px 0;
+  text-align:center;
+  cursor:pointer;
+  color:#fff;
+  box-shadow:0 3px 6px rgba(0,0,0,0.15);
+  transition:transform .12s;
+}
 
-  .center{text-align:center}
-  .logo{
-    height:56px;
-    display:block;
-    margin:8px auto 12px;
-    object-fit:contain;
-    filter:grayscale(100%);
-  }
+.actionBtn:active{ transform:scale(0.88); }
 
-  .shop{font-weight:800;font-size:16px}
-  .meta{font-size:12px;color:#444;margin-top:4px}
+.actionBtn svg{
+  width:26px;height:26px;opacity:0.95;
+}
+.actionLabel{
+  display:block;
+  margin-top:5px;
+  font-size:12px;
+}
 
-  .line{height:1px;background:#ccc;margin:10px 0}
-
-  .items{padding:4px}
-  .item{
-    display:flex;
-    justify-content:space-between;
-    padding:6px 0;
-    border-bottom:1px dashed #c4c4c4;
-  }
-  .item .left{max-width:70%}
-  .item .name{font-weight:700}
-  .item .sub{font-size:12px;color:#666;margin-top:4px}
-
-  .totals{
-    display:flex;
-    justify-content:space-between;
-    font-weight:800;
-    padding:6px 0;
-  }
-
-  .note{font-size:12px;color:#666;margin-top:6px}
-  .small{font-size:12px;color:#777;margin-top:10px;text-align:center}
-
-  .footer{
-    font-size:12px;
-    color:#555;
-    margin-top:14px;
-    text-align:center;
-    line-height:1.4;
-  }
-
-  @media print{
-    body{background:#fff}
-    .controls{display:none}
-    .preview-wrap{padding:0;box-shadow:none}
-    .page{padding:0}
-  }
+/* WARNA */
+#btnSharePng{ background:#2ecc71; }
+#btnCopyTxt{ background:#9b59b6; }
+#btnDownloadTxt{ background:#3498db; }
+#btnPrintTxt{ background:#f1c40f; color:#000; }
 </style>
 </head>
 
 <body>
 
-<div class="page">
+<!-- TOPBAR (TUTORIAL + X) -->
+<div id="topBar">
+  <div id="btnTutorialTop">Lihat Tutorial Print</div>
+  <button id="closeBtn">×</button>
+</div>
 
-  <div class="controls">
-    <button class="btn primary" id="btnSendPDF">Send PDF</button>
-    <button class="btn ghost" id="btnSavePDF">Save PDF</button>
-    <button class="btn warn" id="btnTXT">Versi TXT</button>
+<div id="wrap">
+
+  <div class="center">
+    <img src="assets/logo2.png" style="width:120px;margin-bottom:10px">
   </div>
 
-  <div class="preview-wrap">
-    <div id="paper" class="paper">
+  <div id="header"></div>
+  <div class="line"></div>
 
-      <img id="logoImg" class="logo" src="assets/logo.png">
+  <div id="srvExtra" style="display:none"></div>
+  <div class="line"></div>
 
-      <div class="center shop" id="sShop">Memuat...</div>
-      <div class="center meta" id="sMeta">—</div>
+  <div id="items"></div>
+  <div class="line"></div>
 
-      <div class="line"></div>
+  <div id="totals"></div>
+  <div class="line"></div>
 
-      <div class="items" id="sItems"></div>
+  <div id="operator"></div>
 
-      <div class="line"></div>
+  <br>
+  <div class="center" style="font-size:13px;margin-top:10px;">
+    <b>BIG Motor Tingkulu</b><br>
+    Jl. Tololiu Supit, Wanea 95117<br>
+    bigmotortingkulu.com
+  </div>
+</div>
 
-      <div class="totals"><div>Subtotal</div><div id="sSubtotal">-</div></div>
-      <div class="totals"><div>Diskon</div><div id="sDiscount">-</div></div>
-      <div class="totals" style="font-size:15px;margin-top:6px">
-        <div>Total</div><div id="sTotal">-</div>
-      </div>
+<!-- BUTTON BAR -->
+<div class="actionBar">
 
-      <div class="note" id="sNote"></div>
+  <div class="actionBtn" id="btnSharePng">
+    <svg viewBox="0 0 24 24">
+      <path d="M4 12c0-1.1.9-2 2-2h7V7l5 5-5 5v-3H6c-1.1 0-2-.9-2-2z"/>
+    </svg>
+    <span class="actionLabel">Share</span>
+  </div>
 
-      <div class="small">Terima kasih atas transaksi Anda</div>
+  <div class="actionBtn" id="btnCopyTxt">
+    <svg viewBox="0 0 24 24">
+      <path d="M16 1H4C2.9 1 2 1.9 2 3v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2z"/>
+    </svg>
+    <span class="actionLabel">Copy</span>
+  </div>
 
-      <div class="footer">
-        Bengkel BIG Motor<br>
-        Jl. Tololiu Supit, Tingkulu-Wanea, Manado 95117<br>
-        bigmotortingkulu.com<br>
-        082296880060
-      </div>
+  <div class="actionBtn" id="btnDownloadTxt">
+    <svg viewBox="0 0 24 24">
+      <path d="M5 20h14v2H5v-2zM12 3v11l4-4h-3V3h-2v7H8l4 4V3z"/>
+    </svg>
+    <span class="actionLabel">Download</span>
+  </div>
 
-    </div>
+  <div class="actionBtn" id="btnPrintTxt">
+    <svg viewBox="0 0 24 24">
+      <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zM7 19v-4h10v4H7zm12-7H5c-.55 0-1-.45-1-1s.45-1 1-1h14c.55 0 1 .45 1 1s-.45 1-1 1zM17 1H7v4h10V1z"/>
+    </svg>
+    <span class="actionLabel">Print</span>
   </div>
 
 </div>
 
-<script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
 <script>
 const API_BASE="https://api.bigmotor.biz.id";
-const $=id=>document.getElementById(id);
-const tid=new URL(location.href).searchParams.get("tid");
+const tid=new URLSearchParams(location.search).get("tid");
 
-function currency(n){return "Rp "+Number(n||0).toLocaleString("id-ID");}
-function isoLocal(s){
-  try{return new Date(s).toLocaleString("id-ID",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});}
-  catch{return s}
+function currency(n){return "Rp " + Number(n||0).toLocaleString("id-ID");}
+function iso(s){
+  const d=new Date(s);
+  if(!s) return "-";
+  return d.toLocaleString("id-ID",{day:"2-digit",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"});
 }
 
-async function getNamaBarang(id){
-  try{
-    const r=await fetch(`${API_BASE}/api/barang/${id}`);
-    const j=await r.json();
-    return j.item?.nama||("Barang #"+id);
-  }catch{return "Barang #"+id;}
+let STRUK_TXT="", RAW_TXT="";
+
+function buildTxt(){
+  STRUK_TXT =
+    document.getElementById("header").innerText + "\n" +
+    "----------------------------\n" +
+    (document.getElementById("srvExtra").innerText.trim()
+      ? document.getElementById("srvExtra").innerText + "\n----------------------------\n"
+      : "") +
+    document.getElementById("items").innerText + "\n----------------------------\n" +
+    document.getElementById("totals").innerText + "\n----------------------------\n" +
+    document.getElementById("operator").innerText + "\n";
 }
 
+/* LOAD STRUK */
 async function loadStruk(){
-  if(!tid){$("sShop").textContent="ID tidak valid";return;}
+  const r=await fetch(`${API_BASE}/api/riwayat/${tid}`);
+  const j=await r.json();
 
-  try{
-    const r=await fetch(`${API_BASE}/api/riwayat/${tid}`);
-    const j=await r.json();
+  const header=document.getElementById("header");
+  const items=document.getElementById("items");
+  const totals=document.getElementById("totals");
+  const srvExtra=document.getElementById("srvExtra");
+  const operator=document.getElementById("operator");
 
-    $("sShop").textContent="BIG Motor Tingkulu";
+  const isServis = tid.startsWith("SRV-");
 
-    let rows=[],subtotal=0,discount=0,note="";
+  let waktu="", user="-", barangList=[], charges=[];
+  let totalBarang=0, totalServis=0, totalCharge=0;
 
-    if(tid.startsWith("SRV-")){
-      let list=[];
-      try{
-        const r2=await fetch(`${API_BASE}/api/servis`);
-        const j2=await r2.json();
-        list=j2.items||[];
-      }catch{}
+  if(isServis){
+    const svc=(await (await fetch(`${API_BASE}/api/servis`)).json()).items || [];
+    const core=tid.replace(/^SRV-|^CHG-/,"");
+    const main=svc.find(x=>x.transaksi_id?.startsWith("SRV-") &&
+                           x.transaksi_id.replace(/^SRV-|^CHG-/,"")==core) || {};
 
-      const core=tid.replace(/^SRV-|^CHG-/,"");
+    waktu = main.created_at || main.updated_at;
+    user = main.dibuat_oleh || main.diselesaikan_oleh || "-";
 
-      const main=list.find(
-        x=>x.transaksi_id?.startsWith("SRV-") &&
-        x.transaksi_id.replace(/^SRV-|^CHG-/,"")==core
-      ) || {};
+    let list=[];
+    try{ list=JSON.parse(main.items||"[]"); }catch{}
 
-      $("sMeta").textContent=`Oleh: ${main.dibuat_oleh||"-"} • ${isoLocal(main.created_at)}`;
+    for(const b of list){
+      let nm="";
+      try { nm = await getNamaBarang(b.id||b.id_barang||b.barang_id); }
+      catch { nm = "Barang #" + (b.id||b.id_barang||b.barang_id); }
 
-      let arr=[];
-      try{arr=JSON.parse(main.items||"[]");}catch{}
-      for(const b of arr){
-        const nama=await getNamaBarang(b.id||b.barang_id);
-        const qty=Number(b.qty||b.jumlah||0);
-        const price=Number(b.harga||0);
-        subtotal+=qty*price;
-        rows.push({nama,sub:"Barang Dipakai",qty,price});
-      }
+      const qty=b.qty||b.jumlah||0;
+      const harga=Number(b.harga||0);
 
-      const bs=Number(main.biaya_servis||0);
-      if(bs>0){subtotal+=bs;rows.push({nama:"Biaya Servis",sub:"Layanan",qty:1,price:bs});}
+      barangList.push({nama:nm,qty:qty,harga:harga});
+      totalBarang += qty*harga;
 
-      const charges=list.filter(
-        x=>x.transaksi_id?.startsWith("CHG-") &&
-        x.transaksi_id.replace(/^SRV-|^CHG-/,"")==core
-      );
-      for(const c of charges){
-        const t=Number(c.biaya_servis||0);
-        if(t>0){subtotal+=t;rows.push({nama:c.nama_servis,sub:"Charge",qty:1,price:t});}
-      }
-
-      note=main.catatan||"";
+      items.innerHTML+=`
+        <div class="item-row">
+          <div><div class="label">${nm}</div>${qty} pcs × ${currency(harga)}</div>
+          <div>${currency(qty*harga)}</div>
+        </div>`;
     }
 
-    else{
-      const who=j.keluar?.[0]?.dibuat_oleh ||
-                j.masuk?.[0]?.dibuat_oleh ||
-                j.audit?.[0]?.dibuat_oleh ||
-                "Admin";
+    charges = svc.filter(c=>c.transaksi_id?.startsWith("CHG-") &&
+                             c.transaksi_id.replace(/^SRV-|^CHG-/,"")==core);
+    charges.forEach(c=>totalCharge+=Number(c.biaya_servis||0));
 
-      const waktu=j.keluar?.[0]?.created_at ||
-                  j.masuk?.[0]?.created_at ||
-                  j.audit?.[0]?.created_at;
+    totalServis=Number(main.biaya_servis||0);
 
-      $("sMeta").textContent=`Oleh: ${who} • ${isoLocal(waktu)}`;
+    totals.innerHTML=`
+      Total Barang: ${currency(totalBarang)}<br>
+      Biaya Servis: ${currency(totalServis)}<br>
+      Charge: ${currency(totalCharge)}<br><br>
+      <b>Grand Total: ${currency(totalBarang+totalServis+totalCharge)}</b>
+    `;
 
-      for(const r of j.keluar||[]){
-        const nama=await getNamaBarang(r.barang_id);
-        subtotal+=r.jumlah*r.harga;
-        rows.push({nama,sub:r.keterangan||"",qty:r.jumlah,price:r.harga});
-      }
+    srvExtra.style.display="block";
+    srvExtra.innerText=`Nama: ${main.nama_servis}\nTeknisi: ${main.teknisi}`;
+  }
 
-      note=j.keluar?.[0]?.keterangan||"";
+  else {
+    const keluar=j.keluar||[];
+    user=keluar[0]?.dibuat_oleh||"-";
+    waktu=keluar[0]?.created_at||"";
+
+    for(const r3 of keluar){
+      let nm="";
+      try { nm = await getNamaBarang(r3.barang_id); }
+      catch { nm = "Barang #" + r3.barang_id; }
+
+      const qty=r3.jumlah||0;
+      const harga=Number(r3.harga||0);
+
+      barangList.push({nama:nm,qty:qty,harga:harga});
+      totalBarang += qty*harga;
+
+      items.innerHTML+=`
+        <div class="item-row">
+          <div><div class="label">${nm}</div>${qty} pcs × ${currency(harga)}</div>
+          <div>${currency(qty*harga)}</div>
+        </div>`;
     }
 
-    $("sNote").textContent=note;
+    totals.innerHTML=`
+      Total Barang: ${currency(totalBarang)}<br>
+      <b>Grand Total: ${currency(totalBarang)}</b>
+    `;
+  }
 
-    const box=$("sItems");
-    box.innerHTML="";
-    rows.forEach(x=>{
-      const d=document.createElement("div");
-      d.className="item";
-      d.innerHTML=`
-        <div class="left">
-          <div class="name">${x.nama}</div>
-          <div class="sub">${x.sub}</div>
-        </div>
-        <div>${x.qty} × ${currency(x.price)}</div>`;
-      box.appendChild(d);
+  header.innerHTML=`
+    <div class="title">NOTA ${isServis?"SERVIS":"PENJUALAN"}</div>
+    <div class="center">${iso(waktu)}</div>
+    <div class="center">Nomor: ${tid}</div>`;
+  operator.innerHTML=`Operator: ${user}`;
+
+  buildTxt();
+}
+
+/* SHARE PNG */
+document.getElementById("btnSharePng").onclick = async () => {
+  const wrap=document.getElementById("wrap");
+  const theCanvas=await html2canvas(wrap,{scale:2});
+  const blob=await new Promise(res=>theCanvas.toBlob(res,"image/png"));
+  const file=new File([blob],tid+".png",{type:"image/png"});
+
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    await navigator.share({
+      title:"Struk "+tid,
+      text:"Struk transaksi",
+      files:[file]
     });
-
-    $("sSubtotal").textContent=currency(subtotal);
-    $("sDiscount").textContent=currency(discount);
-    $("sTotal").textContent=currency(subtotal-discount);
-
-  }catch{
-    $("sShop").textContent="Gagal memuat";
-  }
-}
-
-async function imgToBase64(el){
-  return new Promise((resolve,reject)=>{
-    const img=new Image();
-    img.crossOrigin="anonymous";
-    img.onload=()=>{
-      const c=document.createElement("canvas");
-      c.width=img.width;c.height=img.height;
-      c.getContext("2d").drawImage(img,0,0);
-      resolve(c.toDataURL("image/png"));
-    };
-    img.onerror=()=>reject();
-    img.src=el.src;
-  });
-}
-
-function openPrintPreview(blob){
-  const url=URL.createObjectURL(blob);
-  const w=window.open("");
-  if(!w){alert("Pop-up diblokir");return;}
-  w.document.write(`
-    <img src="${url}" style="width:100%;display:block;margin:0 auto"
-         onload="setTimeout(()=>print(),200)">
-  `);
-}
-
-async function renderReceipt(scale){
-  const paper=$("paper");
-  const logo=$("logoImg");
-  const orig=logo.src;
-
-  try{
-    if(!orig.startsWith("data:")){
-      logo.src=await imgToBase64(logo);
-      await new Promise(r=>setTimeout(r,80));
-    }
-  }catch{}
-
-  try{
-    const canvas=await html2canvas(paper,{scale,useCORS:true,backgroundColor:"#fff"});
-    const blob=await new Promise(r=>canvas.toBlob(r,"image/png",0.92));
-    openPrintPreview(blob);
-  }catch(e){
-    alert("Gagal PDF: "+e.message);
-  }finally{
-    logo.src=orig;
-  }
-}
-
-$("btnSavePDF").onclick=()=>renderReceipt(3);
-
-$("btnSendPDF").onclick=async()=>{
-  try{
-    const paper=$("paper");
-    const canvas=await html2canvas(paper,{scale:2,useCORS:true,backgroundColor:"#fff"});
-    const blob=await new Promise(r=>canvas.toBlob(r,"image/png",0.92));
-    const file=new File([blob],`struk-${tid}.png`,{type:"image/png"});
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:"Struk"});
-    }else openPrintPreview(blob);
-  }catch(e){
-    alert("Gagal share");
   }
 };
 
-$("btnTXT").onclick=()=>{
-  const shop=$("sShop").textContent.trim();
-  const meta=$("sMeta").textContent.trim();
-  const items=[...document.querySelectorAll(".item")].map(it=>{
-    const n=it.querySelector(".name").textContent.trim();
-    const s=it.querySelector(".sub").textContent.trim();
-    const q=it.lastElementChild.textContent.trim();
-    return `${n}${s?" ("+s+")":""}\n  ${q}`;
-  }).join("\n\n");
+/* COPY TXT */
+document.getElementById("btnCopyTxt").onclick=async()=>{try{await navigator.clipboard.writeText(STRUK_TXT);}catch(e){}}
 
-  const subtotal=$("sSubtotal").textContent.trim();
-  const total=$("sTotal").textContent.trim();
-  const note=$("sNote").textContent.trim();
-
-  const txt =
-`${shop}
-${meta}
-
-${items}
-
-Subtotal: ${subtotal}
-Total: ${total}
-
-Catatan:
-${note}
-`;
-
-  const blob=new Blob([txt],{type:"text/plain"});
+/* DOWNLOAD TXT */
+document.getElementById("btnDownloadTxt").onclick=()=>{
+  const blob=new Blob([STRUK_TXT],{type:"text/plain"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
-  a.download=`struk-${tid}.txt`;
+  a.download=tid+".txt";
   a.click();
 };
 
+/* PRINT RAW TXT */
+document.getElementById("btnPrintTxt").onclick=async()=>{
+  const blob=new Blob([RAW_TXT],{type:"text/plain"});
+  const file=new File([blob],tid+"_raw.txt",{type:"text/plain"});
+
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    await navigator.share({
+      title:"Print Struk",
+      text:"File struk untuk printer",
+      files:[file]
+    });
+  }
+};
+
+/* TOMBOL TUTORIAL */
+btnTutorialTop.onclick=()=>location.href="tutorial.html";
+
+/* CLOSE */
+closeBtn.onclick=()=>history.back();
+
 loadStruk();
+
+async function getNamaBarang(id){
+  const r=await fetch(`${API_BASE}/api/barang/${id}`);
+  const j=await r.json();
+  return j.item?.nama || ("Barang #"+id);
+}
 </script>
 
 </body>
