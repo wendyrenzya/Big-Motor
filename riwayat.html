@@ -557,8 +557,13 @@ async function fetchPreview(tid,av,meta,items,total){
       );
       const totalCharge=chargeList.reduce((a,b)=>a+Number(b.biaya_servis||0),0);
 
-      items.textContent=
-        `Servis ${compact(biayaServis)} • Charge ${compact(totalCharge)} • Barang ${compact(totalBarang)}`;
+      // === Preview SERVIS dinamis (hilangkan yang 0) ===
+let parts = [`Servis ${compact(biayaServis)}`];
+
+if (totalCharge > 0) parts.push(`Charge ${compact(totalCharge)}`);
+if (totalBarang > 0) parts.push(`Barang ${compact(totalBarang)}`);
+
+items.textContent = parts.join(" • ");
       total.textContent=currency(biayaServis+totalCharge+totalBarang);
 
      // === PATCH: gunakan dibuat_oleh / diselesaikan_oleh dari table servis ===
@@ -626,9 +631,22 @@ const who = getServisWho(svcMain);
       }
     }
 
-    if(all.length>3) out.push(`+ ${all.length-3} item lainnya`);
+    // warna card mengikuti tipe transaksi
+const color = getComputedStyle(items.closest(".card")).getPropertyValue("--c1").trim();
 
-    items.innerHTML=out.join("<br>");
+if (all.length > 3) {
+  out.push(
+    `<span style="
+        color:${color};
+        font-weight:700;
+        font-style:italic;
+     ">
+       + ${all.length - 3} item lainnya
+     </span>`
+  );
+}
+
+items.innerHTML = out.join("<br>");
     total.textContent=grand?currency(grand):`${all.length} item`;
 
   }catch{
@@ -658,90 +676,191 @@ async function openDetail(tid){
     const box=$("dlgItems");
     box.innerHTML="";
 
-    if(String(tid).startsWith("SRV-")){
-      let listServis=[];
-      try{
-        const r2=await fetch(`${API_BASE}/api/servis`);
-        const j2=await r2.json();
-        listServis=j2.items||[];
-      }catch{}
 
-      const core=getCoreFromTid(tid);
+    if (String(tid).startsWith("SRV-")) {
 
-      const svcMain=listServis.find(x =>
+    let listServis = [];
+    try {
+        const r2 = await fetch(`${API_BASE}/api/servis`);
+        const j2 = await r2.json();
+        listServis = j2.items || [];
+    } catch {}
+
+    const core = getCoreFromTid(tid);
+
+    const svcMain = listServis.find(x =>
         x.transaksi_id &&
         x.transaksi_id.startsWith("SRV-") &&
-        getCoreFromTid(x.transaksi_id)===core
-      )||{};
+        getCoreFromTid(x.transaksi_id) === core
+    ) || {};
 
-      let barangAsli=[];
-      try{ barangAsli=JSON.parse(svcMain.items||"[]"); }catch{}
+    let barangAsli = [];
+    try { barangAsli = JSON.parse(svcMain.items || "[]"); } catch {}
 
-     $("dlgTitle").textContent = `Servis • ${tid}`;
 
-// === PATCH: tampilkan dibuat_oleh + diselesaikan_oleh ===
-let dibuat = svcMain.dibuat_oleh ? `Dibuat oleh: ${svcMain.dibuat_oleh}` : "Dibuat oleh: -";
-let selesai = svcMain.diselesaikan_oleh ? `Diselesaikan oleh: ${svcMain.diselesaikan_oleh}` : "Diselesaikan oleh: -";
+    /* ======================
+       HEADER POPUP
+    ======================= */
 
+    $("dlgTitle").textContent = "Detail Servis";
+    $("dlgTitle").style.textAlign = "center";   /* <= Tengah */
+
+    let dibuat = svcMain.dibuat_oleh || "-";
+    let selesai = svcMain.diselesaikan_oleh || "-";
+
+    let metaText =
+      (dibuat === selesai)
+       ? `Dibuat & diselesaikan oleh: <b>${dibuat}</b>`
+       : `Dibuat oleh: <b>${dibuat}</b><br>Diselesaikan oleh: <b>${selesai}</b>`;
+
+    $("dlgMeta").style.cssText = "font-size:12px;color:#666;text-align:right;line-height:1.4";
 $("dlgMeta").innerHTML =
-  `${dibuat}<br>${selesai}<br>` +
-  `Teknisi: ${svcMain.teknisi || "-"} • Biaya: ${currency(svcMain.biaya_servis || 0)}`;
+    `No: ${tid}<br>` +
+    `Waktu: ${isoToLocal(svcMain.created_at)}<br>` +
+    `Teknisi: <b>${svcMain.teknisi || "-"}</b>`;
 
-      box.innerHTML=
-        `<div style="padding:8px 0;border-bottom:1px dashed #e8e8e8">
-           <div style='font-weight:700'>${svcMain.nama_servis||""}</div>
-           <div style='font-size:12px;color:var(--muted)'>${svcMain.catatan||""}</div>
-         </div>`;
+    const box = $("dlgItems");
+    box.innerHTML = "";
 
-      for(const b of barangAsli){
-        const div=document.createElement("div");
-        div.style.cssText=
-          "padding:8px 0;border-bottom:1px dashed #e8e8e8;display:flex;justify-content:space-between";
 
-        let nama= `Barang #${b.id||b.id_barang||b.barang_id||""}`;
-        try{ nama=await getNamaBarang(b.id||b.id_barang||b.barang_id); }catch{}
+    /* ======================
+       SECTION: SERVIS (HIGHLIGHT)
+    ======================= */
 
-        div.innerHTML=
-          `<div>
-             <div style='font-weight:700'>${nama}</div>
-             <div style='font-size:12px;color:var(--muted)'>Barang Dipakai</div>
-           </div>
-           <div style='text-align:right'>
-             <div style='font-weight:800'>${(b.qty||b.jumlah||0)} × ${currency(b.harga||0)}</div>
-           `;
-        box.appendChild(div);
-      }
+    const hServis = document.createElement("div");
+    hServis.style.cssText =
+      "font-weight:900;background:#f5f7ff;padding:8px 12px;border-radius:10px;margin-top:14px;font-size:15px;";
+    hServis.textContent = "Servis";
+    box.appendChild(hServis);
 
-      const chargeList=listServis.filter(x =>
+    const servisRow = document.createElement("div");
+    servisRow.style.cssText =
+      "padding:12px 4px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #eee";
+
+    servisRow.innerHTML = `
+      <div style='max-width:65%;font-weight:700;'>
+          ${svcMain.nama_servis || "-"}
+      </div>
+      <div style='text-align:right;font-weight:800;font-size:15px;white-space:nowrap;'>
+          ${currency(svcMain.biaya_servis || 0)}
+      </div>
+    `;
+    box.appendChild(servisRow);
+
+
+
+    /* ======================
+       SECTION: CHARGE (HIGHLIGHT)
+    ======================= */
+
+    const chargeList = listServis.filter(x =>
         x.transaksi_id &&
         x.transaksi_id.startsWith("CHG-") &&
-        getCoreFromTid(x.transaksi_id)===core
-      );
+        getCoreFromTid(x.transaksi_id) === core
+    );
 
-      if(chargeList.length){
-        const h=document.createElement("div");
-        h.style.cssText=
-          "padding:8px 0;border-bottom:1px solid #ddd;margin-top:12px;font-weight:700";
-        h.textContent="Charge";
-        box.appendChild(h);
+    if (chargeList.length > 0) {
 
-        for(const ch of chargeList){
-          const div=document.createElement("div");
-          div.style.cssText=
-            "padding:8px 0;border-bottom:1px dashed #e8e8e8;display:flex;justify-content:space-between";
-          div.innerHTML=
-            `<div><div style='font-weight:700'>${ch.nama_servis}</div></div>
-             <div style='text-align:right'>
-               <div style='font-weight:800'>${currency(ch.biaya_servis||0)}</div>
-             </div>`;
-          box.appendChild(div);
+        const hCharge = document.createElement("div");
+        hCharge.style.cssText =
+          "font-weight:900;background:#fff6f2;padding:8px 12px;border-radius:10px;margin-top:20px;font-size:15px;";
+        hCharge.textContent = "Charge";
+        box.appendChild(hCharge);
+
+        for (const ch of chargeList) {
+            const row = document.createElement("div");
+            row.style.cssText =
+              "padding:10px 4px;border-bottom:1px dashed #eee;display:flex;justify-content:space-between;align-items:flex-start";
+
+            row.innerHTML = `
+                <div style='max-width:65%;font-weight:600'>${ch.nama_servis}</div>
+                <div style='text-align:right;font-weight:800;white-space:nowrap'>
+                    ${currency(ch.biaya_servis || 0)}
+                </div>
+            `;
+            box.appendChild(row);
         }
-      }
-
-      $("btnLihatStruk").style.display = "inline-block";
-      $("overlayDetail").style.display="flex";
-      return;
     }
+
+
+
+    /* ======================
+       SECTION: BARANG (HIGHLIGHT)
+       Barang = 0 → JANGAN tampilkan label
+    ======================= */
+
+    if (barangAsli.length > 0) {
+
+        const hBarang = document.createElement("div");
+        hBarang.style.cssText =
+          "font-weight:900;background:#f2fff5;padding:8px 12px;border-radius:10px;margin-top:20px;font-size:15px;";
+        hBarang.textContent = "Barang";
+        box.appendChild(hBarang);
+
+        for (const b of barangAsli) {
+
+            let nama = `Barang #${b.id || b.id_barang || b.barang_id || ""}`;
+            try { nama = await getNamaBarang(b.id || b.id_barang || b.barang_id); } catch {}
+
+            const row = document.createElement("div");
+            row.style.cssText =
+              "padding:10px 4px;border-bottom:1px dashed #eee;display:flex;justify-content:space-between;gap:10px";
+
+            row.innerHTML = `
+                <div style='max-width:65%;'>
+                    <div style='font-weight:700;line-height:1.3;'>${nama}</div>
+                    <div style='font-size:12px;color:var(--muted)'>Dipakai</div>
+                </div>
+
+                <div style='text-align:right;white-space:nowrap;font-weight:800;'>
+                    ${(b.qty || b.jumlah || 0)} × ${currency(b.harga || 0)}
+                </div>
+            `;
+            box.appendChild(row);
+        }
+    }
+
+
+
+    /* ======================
+       GRAND TOTAL (SEJAJAR)
+    ======================= */
+
+    const totalBarang = barangAsli.reduce(
+        (a, b) => a + (Number(b.qty || b.jumlah || 0) * Number(b.harga || 0)), 0);
+
+    const totalCharge = chargeList.reduce(
+        (a, b) => a + Number(b.biaya_servis || 0), 0);
+
+    const totalServis = Number(svcMain.biaya_servis || 0);
+
+    const grand = totalBarang + totalCharge + totalServis;
+
+    const g = document.createElement("div");
+    g.style.cssText =
+      "margin-top:26px;padding-top:14px;border-top:2px solid #ddd;" +
+      "font-size:16px;font-weight:900;" +
+      "display:flex;justify-content:space-between;align-items:center";
+
+    g.innerHTML = `
+        <span>Grand Total</span>
+        <span>${currency(grand)}</span>
+    `;
+    box.appendChild(g);
+// === Pembuat & penyelesai (kecil, di bawah grand total) ===
+const meta2 = document.createElement("div");
+meta2.style.cssText =
+  "margin-top:6px;font-size:12px;color:#666;line-height:1.4;text-align:right";
+meta2.innerHTML = metaText;  // dari variabel di awal
+box.appendChild(meta2);
+
+    $("btnLihatStruk").style.display = "inline-block";
+    $("overlayDetail").style.display = "flex";
+    return;
+}
+
+
+    
 
     const rows=[];
     const who=
@@ -755,8 +874,19 @@ $("dlgMeta").innerHTML =
       j.keluar?.[0]?.created_at ||
       j.audit?.[0]?.created_at;
 
-    $("dlgTitle").textContent=`Detail • ${tid}`;
-    $("dlgMeta").textContent=`created by ${who} • ${isoToLocal(waktu)}`;
+const type = getType(tid);  // servis / masuk / audit / penjualan
+
+    $("dlgTitle").style.textAlign = "center";
+$("dlgTitle").textContent =
+    type === "penjualan" ? "Detail Penjualan" :
+    type === "masuk"     ? "Detail Stok Masuk" :
+    type === "audit"     ? "Detail Audit" :
+                           "Detail Transaksi";
+
+$("dlgMeta").style.cssText = "font-size:12px;color:#666;text-align:right;line-height:1.4";
+$("dlgMeta").innerHTML =
+  `No: ${tid}<br>` +
+  `Waktu: ${isoToLocal(waktu)}`;
 
     if(j.masuk){
   for(const r of j.masuk){
@@ -800,19 +930,49 @@ if(j.audit){
       div.style.cssText=
         "padding:8px 0;border-bottom:1px dashed #e8e8e8;display:flex;justify-content:space-between";
 
-      div.innerHTML=
-        `<div>
-           <div style='font-weight:700'>${r.nama}</div>
-           <div style='font-size:12px;color:var(--muted)'>${r.ket||""}</div>
-         </div>
-         <div style='text-align:right'>
-           <div style='font-weight:800'>
-             ${r.qty}${r.price?" × "+currency(r.price):""}
-           </div>
-           <div style='font-size:12px;color:var(--muted)'>${r.jenis}</div>
-         </div>`;
+      div.innerHTML =
+  `<div style='max-width:60%;'>
+      <div style='font-weight:700;line-height:1.3;'>${r.nama}</div>
+      <div style='font-size:12px;color:var(--muted)'>${r.ket || ""}</div>
+   </div>
+
+   <div style='text-align:right;white-space:nowrap;'>
+      <div style='font-weight:800'>
+          ${r.qty}${r.price ? " × " + currency(r.price) : ""}
+      </div>
+      <div style='font-size:12px;color:var(--muted)'>${r.jenis}</div>
+   </div>`;
       box.appendChild(div);
     }
+
+// ==== Grand Total hanya untuk Penjualan ====
+let gtotal = rows.reduce(
+  (a,b)=> a + (b.price ? b.price * (Number(b.qty)||0) : 0), 0
+);
+
+// type detektor sudah ada di atas:
+/// const type = getType(tid);
+
+// tampilkan grand total HANYA jika penjualan
+if (type === "penjualan") {
+    const g2 = document.createElement("div");
+    g2.style.cssText =
+      "margin-top:20px;padding-top:12px;border-top:2px solid #ddd;" +
+      "font-size:16px;font-weight:900;" +
+      "display:flex;justify-content:space-between;align-items:center";
+
+    g2.innerHTML = `
+      <span>Grand Total</span>
+      <span>${currency(gtotal)}</span>
+    `;
+    box.appendChild(g2);
+}
+
+const metaFinal = document.createElement("div");
+metaFinal.style.cssText =
+  "margin-top:6px;font-size:12px;color:#666;text-align:right";
+metaFinal.textContent = "Dibuat oleh: " + who;
+box.appendChild(metaFinal);
 
  // aturan: hanya PJL dan SRV yang boleh lihat struk
 const TID = String(tid).toUpperCase();

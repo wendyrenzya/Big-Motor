@@ -329,7 +329,6 @@ buildRaw(true, waktu, user, main, barangList, charges, totalBarang, totalServis,
     }
 
     totals.innerHTML=`
-      Total Barang: ${currency(totalBarang)}<br>
       <b>Grand Total: ${currency(totalBarang)}</b>
     `;
     buildRaw(false, waktu, user, {}, barangList, [], totalBarang, 0, 0);
