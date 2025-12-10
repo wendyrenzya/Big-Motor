@@ -164,9 +164,9 @@ body{
 .fab-add{
   position:fixed;
   right:18px;
-  bottom:30px;
+  bottom:25px;
   background:linear-gradient(135deg,var(--accent),var(--primary));
-  width:58px;height:58px;
+  width:54px;height:54px;
   border-radius:999px;
   display:flex;justify-content:center;align-items:center;
   color:#fff;font-size:32px;font-weight:800;
@@ -178,8 +178,8 @@ body{
 /* FAB HOME */
 .fab-home{
   position:fixed;
-  bottom:20px;
-  left:20px;
+  bottom:25px;
+  left:18px;
   width:54px;
   height:54px;
   background:rgba(255,255,255,0.85);
@@ -305,17 +305,40 @@ async function loadServis(){
     const r = await fetch(API_BASE + "/api/servis?limit=10&offset=" + (page*10));
     const j = await r.json();
     const list = j.items || [];
-    
-    const filtered = list.filter(s=>{
-      const trx = s.transaksi_id;
-      if(trx && String(trx).toUpperCase().startsWith("CHG-")) return false;
-      return true;
+
+// Filter CHG-* hanya untuk tampilan kartu
+const filtered = list.filter(s=>{
+  const trx = s.transaksi_id;
+  if(trx && String(trx).toUpperCase().startsWith("CHG-")) return false;
+  return true;
+});
+
+// PATCH: gabung data tanpa duplikasi + cegah card hilang
+if (page === 0) {
+    window.__ALL_SERVIS = list;
+} else {
+    const existing = new Set(window.__ALL_SERVIS.map(x => x.id_servis));
+    const uniqueOnly = list.filter(x => !existing.has(x.id_servis));
+    window.__ALL_SERVIS = [...window.__ALL_SERVIS, ...uniqueOnly];
+
+    // Render hanya jika ada data baru (jangan render array kosong)
+    const renderList = uniqueOnly.filter(s=>{
+        const trx = s.transaksi_id;
+        if(trx && String(trx).toUpperCase().startsWith("CHG-")) return false;
+        return true;
     });
 
-if(page === 0) window.__ALL_SERVIS = list;
-else window.__ALL_SERVIS = [...window.__ALL_SERVIS, ...list];
+    if (renderList.length > 0) {
+        renderServis(renderList);
+    }
 
-    if(filtered.length < 10) done = true;
+    if (list.length < 10) done = true;
+    page++;
+    loading = false;
+    return;
+}
+
+    if(list.length < 10) done = true;
 
     renderServis(filtered);
     page++;

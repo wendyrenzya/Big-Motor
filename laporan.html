@@ -19,6 +19,21 @@
   --shadow:0 8px 24px rgba(0,0,0,0.06);
 }
 
+.bar-wrap {
+  position: relative;
+}
+.bar-value {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 9px;
+  font-weight: 700;
+  color: #111;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
 *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui;-webkit-tap-highlight-color:transparent}
 
 body{
@@ -502,6 +517,137 @@ function drawDonut(el, vals, colors) {
     el.appendChild(svg);
   }
 }
+
+function drawDonut3LabelsPointer(el, vals, colors, labels) {
+
+  let tries = 0;
+  function wait() {
+    if (el.clientHeight === 0 && tries < 10) {
+      tries++;
+      requestAnimationFrame(wait);
+      return;
+    }
+    render();
+  }
+  wait();
+
+  function render() {
+    el.innerHTML = "";
+
+    vals = vals.map(v => Number(v) || 0);
+    const total = vals.reduce((a,b)=>a+b, 0);
+
+    const svgNS = "http://www.w3.org/2000/svg";
+
+    const W = el.clientWidth;
+    const H = el.clientHeight;
+    const cx = W / 2;
+    const cy = H / 2;
+
+    const r = (Math.min(W, H) / 2) - 10;
+    const innerR = r * 0.55;
+
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", W);
+    svg.setAttribute("height", H);
+
+    // =======================
+    // KASUS TOTAL 0 → donut abu
+    // =======================
+    if (total === 0) {
+      const c1 = document.createElementNS(svgNS, "circle");
+      c1.setAttribute("cx", cx);
+      c1.setAttribute("cy", cy);
+      c1.setAttribute("r", r);
+      c1.setAttribute("fill", "#e5e7eb");
+      svg.appendChild(c1);
+
+      const c2 = document.createElementNS(svgNS, "circle");
+      c2.setAttribute("cx", cx);
+      c2.setAttribute("cy", cy);
+      c2.setAttribute("r", innerR);
+      c2.setAttribute("fill", "white");
+      svg.appendChild(c2);
+
+      el.appendChild(svg);
+      return;
+    }
+
+    let angStart = -Math.PI / 2;
+
+    vals.forEach((v, i) => {
+      if (v <= 0) return;
+
+      const a = (v / total) * Math.PI * 2;
+
+      // ==== BUILD DONUT SLICE ====
+      const x1 = cx + r * Math.cos(angStart);
+      const y1 = cy + r * Math.sin(angStart);
+      const x2 = cx + r * Math.cos(angStart + a);
+      const y2 = cy + r * Math.sin(angStart + a);
+
+      const largeArc = a > Math.PI ? 1 : 0;
+
+      const path = document.createElementNS(svgNS, "path");
+      path.setAttribute("fill", colors[i]);
+      path.setAttribute(
+        "d",
+        `
+        M ${x1} ${y1}
+        A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}
+        L ${cx + innerR * Math.cos(angStart + a)} ${cy + innerR * Math.sin(angStart + a)}
+        A ${innerR} ${innerR} 0 ${largeArc} 0 ${cx + innerR * Math.cos(angStart)} ${cy + innerR * Math.sin(angStart)}
+        Z
+        `
+      );
+      svg.appendChild(path);
+
+      // ==== LABEL + GARIS POINTER ====
+      const mid = angStart + a / 2;
+
+      // titik ujung dalam donut
+      const lx = cx + r * Math.cos(mid);
+      const ly = cy + r * Math.sin(mid);
+
+      // titik keluar garis (sedikit keluar dari donut)
+      const ox = cx + (r + 10) * Math.cos(mid);
+      const oy = cy + (r + 10) * Math.sin(mid);
+
+      // posisi teks di luar lingkaran
+      const tx = cx + (r + 26) * Math.cos(mid);
+      const ty = cy + (r + 26) * Math.sin(mid);
+
+      const percent = ((v / total) * 100).toFixed(1).replace(".0","") + "%";
+
+      // pointer line
+      const line = document.createElementNS(svgNS, "line");
+      line.setAttribute("x1", lx);
+      line.setAttribute("y1", ly);
+      line.setAttribute("x2", ox);
+      line.setAttribute("y2", oy);
+      line.setAttribute("stroke", "#555");
+      line.setAttribute("stroke-width", "1.4");
+      svg.appendChild(line);
+
+      // text label (tebal)
+      const text = document.createElementNS(svgNS, "text");
+      text.setAttribute("x", tx);
+      text.setAttribute("y", ty);
+      text.setAttribute("fill", "#111");
+      text.setAttribute("font-size", "11");
+      text.setAttribute("font-weight", "700");
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("dominant-baseline", "middle");
+      text.textContent = percent;
+      svg.appendChild(text);
+
+      angStart += a;
+    });
+
+    el.appendChild(svg);
+  }
+}
+
 /* BAR CHART */
 function drawBarBoxes(el,days,pen,out,prof){
   el.innerHTML="";
@@ -520,13 +666,70 @@ function drawBarBoxes(el,days,pen,out,prof){
     const box=document.createElement("div");
     box.className="dayBox";
 
-    [["#3E8BFF",pen[i]],["#ef4444",out[i]],["#16a34a",prof[i]]].forEach(([color,val])=>{
-      const bar=document.createElement("div");
-      bar.className="bar";
-      bar.style.background=color;
-      bar.style.width=(val/max*100)+"%";
-      box.appendChild(bar);
-    });
+  [
+  ["#3E8BFF", pen[i], "penjualan"],
+  ["#ef4444", out[i], "pengeluaran"],
+  [prof[i] >= 0 ? "#16a34a" : "#000000", prof[i], "profit"]
+].forEach(([color, val]) => {
+
+  // ============================
+  // 1. SKIP TOTAL untuk nilai 0
+  // ============================
+  if (val === 0) return;
+
+  // bungkus item
+  const wrap = document.createElement("div");
+  wrap.style.position = "relative";
+  wrap.style.marginBottom = "4px";
+  wrap.style.borderBottom = "1px solid #e5e7eb";
+  wrap.style.paddingRight = "24px";
+
+  // bar
+  const bar = document.createElement("div");
+  bar.className = "bar";
+  bar.style.background = color;
+
+  const maxVal = max || 1;
+  const raw = val < 0 ? (Math.abs(val) / maxVal * 100) : (val / maxVal * 100);
+  const SAFE_GAP = 30;
+
+  const boxWidth = box.clientWidth || 200;
+  const rawPx = (raw / 100) * boxWidth;
+
+  // bar negatif → tetap tampil (warna hitam sudah diberikan)
+  if (val < 0) {
+    bar.style.width = "6px"; // bar negatif, kecil tapi terlihat
+  }
+  // bar kecil tapi positif → minimal 4px
+  else if (rawPx < 4) {
+    bar.style.width = "4px";
+  }
+  // bar besar → kurangi gap
+  else if (rawPx > SAFE_GAP) {
+    bar.style.width = `calc(${raw}% - ${SAFE_GAP}px)`;
+  }
+  // bar sedang → normal
+  else {
+    bar.style.width = raw + "%";
+  }
+
+  // angka (ditampilkan jika val ≠ 0)
+  const text = document.createElement("div");
+  text.textContent = Number(val).toLocaleString("id-ID");
+  text.style.position = "absolute";
+  text.style.right = "2px";
+  text.style.top = "50%";
+  text.style.transform = "translateY(-50%)";
+  text.style.fontSize = "9px";
+  text.style.fontWeight = "700";
+  text.style.color = "#111";
+  text.style.pointerEvents = "none";
+  text.style.whiteSpace = "nowrap";
+
+  wrap.appendChild(bar);
+  wrap.appendChild(text);
+  box.appendChild(wrap);
+});
 
     row.appendChild(box);
     el.appendChild(row);
@@ -552,11 +755,12 @@ async function loadBulanan(){
     $("totalPemasukan").textContent=currency(pemasukan);
     $("totalPengeluaran").textContent=currency(j.total_pengeluaran);
     $("totalProfit").textContent=currency(pemasukan-j.total_pengeluaran);
-    drawPie(
-      $("pieChart"),
-      [j.total_penjualan,j.total_charge,j.total_pengeluaran],
-      ["#3E8BFF","#FFD56E","#ef4444"]
-    );
+    drawDonut3LabelsPointer(
+  $("pieChart"),
+  [j.total_penjualan, j.total_charge, j.total_pengeluaran],
+  ["#3E8BFF", "#FFD56E", "#ef4444"],
+  ["Penjualan", "Charge", "Pengeluaran"]
+);
   }catch{}
 }
 
