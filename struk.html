@@ -207,6 +207,40 @@ function buildTxt(){
     document.getElementById("totals").innerText + "\n----------------------------\n" +
     document.getElementById("operator").innerText + "\n";
 }
+function buildRaw(isServis,waktu,user,main,barangList,charges,totalBarang,totalServis,totalCharge){
+  let t="";
+  t+=`Jenis: ${isServis?"Servis":"Penjualan"}\n`;
+  t+=`ID: ${tid}\n`;
+  t+=`Waktu: ${iso(waktu)}\n`;
+  t+=`Operator: ${user}\n\n`;
+
+  t+=`Barang:\n`;
+  for(let i=0;i<barangList.length;i++){
+    const b=barangList[i];
+    t+=`${i+1}. Nama: ${b.nama}\n`;
+    t+=`   Qty: ${b.qty}\n`;
+    t+=`   Harga: ${b.harga}\n`;
+    t+=`   Total: ${b.qty*b.harga}\n`;
+  }
+
+  if(isServis && charges.length){
+    t+=`\nCharge:\n`;
+    for(const c of charges){
+      t+=`- Nama: ${c.nama_servis}\n  Biaya: ${c.biaya_servis}\n`;
+    }
+  }
+
+  t+=`\nTotal barang: ${totalBarang}\n`;
+  if(isServis){
+    t+=`Total charge: ${totalCharge}\n`;
+    t+=`Total servis: ${totalServis}\n`;
+    t+=`Grand total: ${totalBarang+totalServis+totalCharge}\n`;
+  } else {
+    t+=`Grand total: ${totalBarang}\n`;
+  }
+
+  RAW_TXT = t;
+}
 
 /* LOAD STRUK */
 async function loadStruk(){
@@ -266,7 +300,7 @@ async function loadStruk(){
       Charge: ${currency(totalCharge)}<br><br>
       <b>Grand Total: ${currency(totalBarang+totalServis+totalCharge)}</b>
     `;
-
+buildRaw(true, waktu, user, main, barangList, charges, totalBarang, totalServis, totalCharge);
     srvExtra.style.display="block";
     srvExtra.innerText=`Nama: ${main.nama_servis}\nTeknisi: ${main.teknisi}`;
   }
@@ -298,6 +332,7 @@ async function loadStruk(){
       Total Barang: ${currency(totalBarang)}<br>
       <b>Grand Total: ${currency(totalBarang)}</b>
     `;
+    buildRaw(false, waktu, user, {}, barangList, [], totalBarang, 0, 0);
   }
 
   header.innerHTML=`
