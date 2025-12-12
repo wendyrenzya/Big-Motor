@@ -331,6 +331,17 @@ body {
   font-weight: 700;
   margin-bottom: 8px;
 }
+
+.card-bg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 120px;         /* sesuaikan */
+  opacity: 0.50;        /* cukup samar */
+  pointer-events: none; /* tidak mengganggu klik */
+  user-select: none;
+  z-index: 1;
+}
   </style>
 </head>
 
@@ -690,6 +701,10 @@ function renderList(items){
   sorted.forEach(inv=>{
     const card = document.createElement("div");
     card.className = "card";
+    const bg = document.createElement("img");
+bg.src = "assets/invoice200.png";
+bg.className = "card-bg";
+card.appendChild(bg);
 
 if (inv.status === "paid") {
   const stamp = document.createElement("div");
