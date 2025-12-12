@@ -17,6 +17,22 @@
   --card:#fff;
 }
 
+#okOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:50000;
+  display:none;
+}
+#okOverlay .ok-icon{
+  font-size:120px;
+  color:var(--success);
+  font-weight:800;
+}
+
 .add-btn-plus{
   position:fixed;
   right:18px;
@@ -236,6 +252,7 @@ body{
   height:auto;
   z-index:5;
 }
+
 </style>
 </head>
 
@@ -516,9 +533,7 @@ function renderSummary(final){
     `;
   });
 
-  if(final){
-    html+=`<div class="check-big">✔</div>`;
-  }
+  
 
   wrap.innerHTML=html;
 }
@@ -603,8 +618,14 @@ async function saveAll(){
       return;
     }
 
-    showToast("Audit tersimpan");
-    setTimeout(()=>location.href="riwayat.html",600);
+    renderSummary(true); // ganti table status
+
+$("okOverlay").style.display = "flex";
+
+setTimeout(()=>{
+  location.href = "riwayat.html";
+}, 5000);
+
   }catch(e){
     showToast("Error koneksi");
   }
@@ -658,5 +679,9 @@ $("closePopup").onclick = () => {
 })();
 </script>
 
+</script>
+<div id="okOverlay">
+  <div class="ok-icon">✔</div>
+</div>
 </body>
 </html>

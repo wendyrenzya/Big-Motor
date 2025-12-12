@@ -6,6 +6,28 @@
 <title>Laporan Harian • BigMotor</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+    
+    .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-right-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  opacity: 0.85;
+}
+
+    .total-row {
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 2px solid #dfe3eb;
+}
+body {
+  background: linear-gradient(#f4f6fa, #eef1f6);
+}
     /* FAB BACK LEFT BOTTOM */
 .fab-back{
   position:fixed;
@@ -14,13 +36,14 @@
   width:58px;
   height:58px;
   border-radius:50%;
-  background:#ffffff;
+  background:rgba(255,255,255,0.3);   /* transparan */
   box-shadow:0 4px 18px rgba(0,0,0,0.22);
   display:flex;
   justify-content:center;
   align-items:center;
   cursor:pointer;
   z-index:999;
+  backdrop-filter: blur(4px);         /* opsional: modern look */
 }
 .fab-back img{
   width:32px;
@@ -42,9 +65,34 @@ body{margin:0;background:var(--bg);padding-bottom:120px}
 .h-sub{color:var(--muted);font-size:13px;margin-top:6px}
 .h-time{color:var(--muted);font-size:13px;margin-top:6px}
 .container{max-width:980px;margin:12px auto;padding:0 12px}
-.card{background:var(--card);border-radius:var(--radius);padding:14px;margin:14px 0;box-shadow:var(--shadow)}
-.card-title{font-weight:700;margin-bottom:8px}
-.row{display:flex;justify-content:space-between;padding:6px 0;border-top:0;font-size:14px}
+
+.card {
+  border-radius: 14px;
+  padding: 18px;
+  background: white;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  border: 1px solid #eef0f3;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #1a1f36;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  border-bottom: 1px solid #f1f2f4;
+}
+.row:last-of-type {
+  border-bottom: 0;
+}
+.row-strong {
+  font-weight: 900;
+  color: #0f3ddd;
+}
 .row:first-of-type{border-top:0}
 .userBox{display:flex;align-items:center;gap:10px;margin-top:8px}
 .userBox img{width:36px;height:36px;border-radius:50%;object-fit:cover}
@@ -65,13 +113,31 @@ label{display:block;font-size:13px;color:#333;margin-bottom:6px;font-weight:600}
 .btn-ghost{background:#6b7280}
 .note{font-size:12px;color:#6b7280;margin-top:8px}
 .loading{padding:22px;text-align:center;color:var(--muted)}
+
+.card-bg-mid {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;              /* sesuaikan */
+  transform: translate(-50%, -50%);
+  opacity: 0.35;             /* lebih kuat dari invoice */
+  filter: contrast(1.3) brightness(1.05);
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+.card { position: relative; overflow: hidden; }
 </style>
 </head>
 <body>
 <div class="header">
-  <div class="h-title">BIG Motor Tingkulu</div>
-  <div class="h-sub">Laporan Harian</div>
-  <div id="headerTime" class="h-time"></div>
+  <div>
+    <div class="h-title">BIG Motor Tingkulu</div>
+    <div class="h-sub">Laporan Harian</div>
+    <div id="headerTime" class="h-time"></div>
+  </div>
+
+  <img src="assets/lapor.png" class="header-right-img">
 </div>
 
 <div class="container" id="listRoot">
@@ -185,49 +251,60 @@ async function loadList(){
     }
 
     j.items.forEach(d => {
-      const card = document.createElement("div");
-      card.className = "card";
-     card.innerHTML = `
-  <div class="card-title">${formatTanggal(d.tanggal)}</div>
+  const card = document.createElement("div");
+  card.className = "card";
 
-  <div class="row"><div>Penjualan Total</div>
-    <div class="row-strong">${fmt(Number(d.penjualan_cash) + Number(d.penjualan_transfer))}</div>
-  </div>
+  // Buat background
+  const bg = document.createElement("img");
+  bg.src = "assets/harian200.png";
+  bg.className = "card-bg-mid";
 
-  <div class="row"><div>Cash</div>
-    <div>${fmt(d.penjualan_cash)}</div>
-  </div>
+  // Isi card
+  card.innerHTML = `
+    <div class="card-title">${formatTanggal(d.tanggal)}</div>
 
-  <div class="row"><div>Transfer</div>
-    <div>${fmt(d.penjualan_transfer)}</div>
-  </div>
+    <div class="row"><div>Penjualan Total</div>
+      <div class="row-strong">${fmt(Number(d.penjualan_cash) + Number(d.penjualan_transfer))}</div>
+    </div>
 
-  <div class="row"><div>Pengeluaran</div>
-    <div>${fmt(d.pengeluaran)}</div>
-  </div>
+    <div class="row"><div>Cash</div>
+      <div>${fmt(d.penjualan_cash)}</div>
+    </div>
 
-  <div class="row"><div>Uang Angin</div>
-    <div>${fmt(d.uang_angin)}</div>
-  </div>
+    <div class="row"><div>Transfer</div>
+      <div>${fmt(d.penjualan_transfer)}</div>
+    </div>
 
-  <div class="row"><div>Charge Servis</div>
-    <div>${fmt(d.charge_servis)}</div>
-  </div>
+    <div class="row"><div>Pengeluaran</div>
+      <div>${fmt(d.pengeluaran)}</div>
+    </div>
 
-  <div class="row" style="margin-top:8px">
-    <div>Total Setoran</div>
-    <div class="row-strong">${
-      fmt(
-        Number(d.penjualan_cash)
-        + Number(d.uang_angin)
-        + Number(d.charge_servis)
-        - Number(d.pengeluaran)
-      )
-    }</div>
-  </div>
-`;
-      root.appendChild(card);
-    });
+    <div class="row"><div>Uang Angin</div>
+      <div>${fmt(d.uang_angin)}</div>
+    </div>
+
+    <div class="row"><div>Charge Servis</div>
+      <div>${fmt(d.charge_servis)}</div>
+    </div>
+
+    <div class="row total-row">
+      <div>Total Setoran</div>
+      <div class="row-strong">${
+        fmt(
+          Number(d.penjualan_cash)
+          + Number(d.uang_angin)
+          + Number(d.charge_servis)
+          - Number(d.pengeluaran)
+        )
+      }</div>
+    </div>
+  `;
+
+  // Penting: append gambar SETELAH innerHTML
+  card.appendChild(bg);
+
+  root.appendChild(card);
+});
 
   }catch(err){
     root.innerHTML = '<div class="loading">Gagal memuat data</div>';
