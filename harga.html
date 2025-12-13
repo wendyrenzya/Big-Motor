@@ -20,43 +20,63 @@ body{
   padding-bottom:100px;
 }
 
-/* HEADER STYLE versi list_katalog */
-.header-wrap{ position:relative; }
+/* ========== GLOBAL FIX ========== */
+*{
+  -webkit-tap-highlight-color: transparent;
+}
 
-.header{
-  background:linear-gradient(90deg,#e8f0ff,#f3f7ff);
-  padding:14px 16px;
-  padding-right:90px;
-  border-bottom:1px solid #e6eefc;
+/* ========== HEADER (COPY 1:1 DARI PENGATURAN) ========== */
+.sticky-top{
   position:sticky;
   top:0;
-  z-index:20;
+  z-index:50;
+  background:#f4f6f9;
+
+  /* body TIDAK punya padding, jadi TIDAK pakai margin negatif */
+  padding:12px;
 }
+
+.header-wrap{
+  border-radius:18px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 10px 28px rgba(0,0,0,.12);
+}
+
+.header{
+  background:linear-gradient(
+    90deg,
+    #d3e2ff 0%,
+    #e8f0ff 50%,
+    #f5f8ff 100%
+  );
+  padding:14px 16px;
+  padding-right:90px;
+  position:relative;
+  border-bottom:1px solid #e6eefc;
+}
+
+.header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:url("assets/headerbg.png") center/cover no-repeat;
+  opacity:.20;
+  z-index:1;
+}
+
+.header > *{ position:relative; z-index:2; }
+
+.h-title{ font-size:18px; font-weight:800; }
+.h-sub{ font-size:14px; font-weight:600; color:#666; margin-top:2px; }
+.h-time{ font-size:13px; color:#666; margin-top:6px; }
 
 .header-icon{
   position:absolute;
   right:14px;
   top:50%;
   transform:translateY(-50%);
-  width:54px;
-}
-
-.h-title{
-  font-size:18px;
-  font-weight:800;
-}
-
-.h-sub{
-  font-size:14px;
-  font-weight:600;
-  color:#666;
-  margin-top:2px;
-}
-
-.h-web{
-  font-size:13px;
-  color:#666;
-  margin-top:4px;
+  width:80px;
 }
 
 /* BASE CARD */
@@ -132,18 +152,24 @@ body{
 .fab-home img{
   width:30px;height:30px;
 }
+#list{
+  padding-left:16px;
+  padding-right:16px;
+}
 </style>
 </head>
 
 <body>
 
 <!-- HEADER -->
-<div class="header-wrap">
-  <div class="header">
-    <div class="h-title">BIG Motor Tingkulu</div>
-    <div class="h-sub">List Perubahan Harga</div>
-    <div id="headerTime" class="h-web"></div>
-    <img src="assets/harga.png" class="header-icon">
+<div class="sticky-top">
+  <div class="header-wrap">
+    <div class="header">
+      <div class="h-title">List Perubahan Harga</div>
+      <div class="h-sub">BIG Motor Tingkulu</div>
+      <div id="headerTime" class="h-time"></div>
+      <img src="assets/harga.png" class="header-icon">
+    </div>
   </div>
 </div>
 
@@ -298,15 +324,15 @@ window.addEventListener("scroll",()=>{
 });
 
 /* CLOCK */
-function tickHeader(){
-  const d=new Date();
-  $("headerTime").textContent =
-    d.toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"})+
-    " • "+
+function updateHeaderTime(){
+  const d = new Date();
+  document.getElementById("headerTime").textContent =
+    d.toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"})
+    + " • " +
     d.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
 }
-setInterval(tickHeader,1000);
-tickHeader();
+setInterval(updateHeaderTime, 10000);
+updateHeaderTime();
 
 /* INIT */
 (async()=>{

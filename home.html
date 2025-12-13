@@ -9,11 +9,65 @@
 <style>
 :root { --card:#fff; }
 
+/* === HOME USER HEADER STYLE (MENIRU PENJUALAN) === */
+.home-header-card{
+  position:relative;
+  background:linear-gradient(
+    90deg,
+    #d3e2ff 0%,
+    #e8f0ff 50%,
+    #f5f8ff 100%
+  );
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 6px 16px rgba(0,0,0,.12);
+}
+
+/* overlay background image */
+.home-header-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:url("assets/headerbg.png") no-repeat center;
+  background-size:cover;
+  opacity:0.18;
+  pointer-events:none;
+  z-index:1;
+}
+
+/* pastikan isi di atas overlay */
+.home-header-card > *{
+  position:relative;
+  z-index:2;
+}
+/* override background header KHUSUS home */
+.header.home-header-card{
+  background:linear-gradient(
+    90deg,
+    #d3e2ff 0%,
+    #e8f0ff 50%,
+    #f5f8ff 100%
+  ) !important;
+}
+/* Font Caveat khusus header home */
+#userName{
+  font-family: 'Caveat', cursive;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+#dateTimeText{
+  font-family: 'Caveat', cursive;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
 /* =========================================
    HEADER
    ========================================= */
 .header-avatar {
-  width:48px; height:48px; border-radius:50%; object-fit:cover;
+  width:60px; height:60px; border-radius:50%; object-fit:cover;
   position:absolute; right:16px; top:16px;
   box-shadow:0 2px 8px rgba(0,0,0,0.14);
 }
@@ -563,7 +617,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 <!-- HEADER -->
 <div class="header-wrap">
-  <div class="header">
+  <div class="header home-header-card">
     <div class="user-row"><div id="userName">Hai, Guest</div></div>
     <div class="datetime" id="dateTimeText">Memuat waktu...</div>
     <img id="headerUserFoto" class="header-avatar">

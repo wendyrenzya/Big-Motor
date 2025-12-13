@@ -168,6 +168,7 @@
 
 <script>
 const API_BASE = "https://api.bigmotor.biz.id";
+const API_LAST_LOGIN = "https://msg.wendyrenzya.workers.dev";
 let isLoading = false;
 
 function togglePassword(){
@@ -232,6 +233,12 @@ async function doLogin(){
     localStorage.setItem("username", data.username || username);
     localStorage.setItem("nama", data.nama || "");
     localStorage.setItem("role", data.role || "");
+
+await fetch(API_LAST_LOGIN + "/api/users/last-login", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ username })
+});
 
     location.href = "home.html";
 

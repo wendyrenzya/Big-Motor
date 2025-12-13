@@ -14,23 +14,56 @@
   }
 
 /* ========== HEADER STYLE ========== */
-.header-wrap{ position:relative; }
-
-.header{
-  background:linear-gradient(90deg,#e8f0ff,#f3f7ff);
-  padding:14px 16px;
-  padding-right:90px;
-  border-bottom:1px solid #e6eefc;
-  position:sticky; top:0;
-  z-index:20;
+/* ========== HEADER (SAMA DENGAN PENGATURAN) ========== */
+:root{
+  --bg:#f4f5f7;
 }
 
-.header-icon{
+.sticky-top{
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:var(--bg);
+  padding:12px;
+}
+
+.header-wrap{
+  border-radius:18px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 10px 28px rgba(0,0,0,.12);
+}
+
+.header{
+  background:linear-gradient(
+    90deg,
+    #d3e2ff 0%,
+    #e8f0ff 50%,
+    #f5f8ff 100%
+  );
+  padding:14px 16px;
+  padding-right:90px;
+  text-align:left;
+  position:relative;
+  border-bottom:1px solid #e6eefc;
+}
+
+.header::before{
+  content:"";
   position:absolute;
-  right:14px;
-  top:50%;
-  transform:translateY(-50%);
-  width:54px;
+  inset:0;
+  background-image:url("assets/headerbg.png");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:cover;
+  opacity:.20;
+  z-index:1;
+  pointer-events:none;
+}
+
+.header > *{
+  position:relative;
+  z-index:2;
 }
 
 .h-title{
@@ -45,23 +78,21 @@
   margin-top:2px;
 }
 
-.h-web{
+.h-time{
   font-size:13px;
   color:#666;
-  margin-top:4px;
+  margin-top:6px;
 }
 
-  .header-wrap{ padding:22px; }
-  .header-card{
-    background:#fff;
-    border-radius:20px;
-    padding:20px 22px 24px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.1);
-    text-align:center;
-  }
-  .header-small{ font-size:13px;color:#6b7280;margin-bottom:6px; }
-  .header-title{ font-size:22px;font-weight:700;color:#111;margin-bottom:4px; }
-  .header-sub{ font-size:14px;color:#6b7280; }
+.header-icon{
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  width:80px;
+  height:auto;
+  z-index:5;
+}
 
   .content{ padding:22px;padding-top:0; }
 
@@ -145,12 +176,14 @@
 <body>
 
 <!-- HEADER -->
-<div class="header-wrap">
-  <div class="header">
-    <div class="h-title">Absensi</div>
-     <div class="h-web">BIG Motor Tingkulu</div>
-    <div class="h-sub" id="headerTime"></div> 
-    <img src="assets/absensi.png" class="header-icon">
+<div class="sticky-top">
+  <div class="header-wrap">
+    <div class="header">
+      <div class="h-title">Log Absensi</div>
+      <div class="h-sub">BIG Motor</div>
+      <div id="headerTime" class="h-time"></div>
+      <img src="assets/absensi.png" class="header-icon">
+    </div>
   </div>
 </div>
 
@@ -200,7 +233,7 @@ function updateHeaderTime(){
   document.getElementById("headerTime").textContent =
     `${hari}, ${tgl} ${bln} ${thn}, ${jam}:${mnt}`;
 }
-setInterval(updateHeaderTime,1000);
+setInterval(updateHeaderTime,10000);
 updateHeaderTime();
 
 /* ============================================================

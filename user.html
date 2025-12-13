@@ -10,9 +10,19 @@
 <script>
 /* ======= Konfigurasi ======= */
 const API_BASE = "https://api.bigmotor.biz.id";
+const API_LAST_LOGIN = "https://msg.wendyrenzya.workers.dev";
 const CLOUDINARY_UPLOAD = "https://api.cloudinary.com/v1_1/djifuridf/image/upload";
 const CLOUDINARY_PRESET = "bmt_upload";
 const $ = id => document.getElementById(id);
+
+const WA_MAP = {
+  daniel: "6285316500065",
+  firamitha: "6285394334463",
+  nando: "6282195015225",
+  novita: "6287731124442",
+  ramachan: "6285162964172",
+  wendy: "6282296880060"
+};
 
 /* ======= Bounce navigation (copy 1:1 typical) ======= */
 function bounceThenNavigate(el,url){
@@ -37,41 +47,113 @@ document.addEventListener("DOMContentLoaded", ()=>{
 </script>
 
 <style>
+    
+.wa-btn{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  background:#25D366;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 3px 8px rgba(0,0,0,.25);
+}
+.wa-btn svg{
+  width:20px;
+  height:20px;
+  display:block;
+}
+
     #previewFotoBg { display:none; }
 /* ====== Base / layout ====== */
 :root{--card:#fff}
 body{
   margin:0;
-  padding-bottom:92px; /* space for navbar */
+  padding-bottom:0;
   background:#f4f5f7;
   font-family:Inter,Segoe UI,Roboto,Arial;
   color:#222;
 }
-*{ -webkit-tap-highlight-color:transparent }
 
-/* header */
+/* ========== HEADER (COPY 1:1 DARI PENGATURAN) ========== */
+:root{
+  --bg:#f4f5f7;
+}
+
+.sticky-top{
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:var(--bg);
+  padding:12px;
+}
+
+.header-wrap{
+  border-radius:18px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 10px 28px rgba(0,0,0,.12);
+}
+
 .header{
+  background:linear-gradient(
+    90deg,
+    #d3e2ff 0%,
+    #e8f0ff 50%,
+    #f5f8ff 100%
+  );
   padding:14px 16px;
-  background:linear-gradient(135deg,#3E8BFF,#A259FF);
-  color:#fff;
+  padding-right:90px;
+  text-align:left;
+  position:relative;
+  border-bottom:1px solid #e6eefc;
 }
-.header .title{font-size:18px;font-weight:700}
 
-/* info card */
-.info-card{
-  background:var(--card);
-  margin:16px;
-  padding:14px;
-  border-radius:12px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.10);
-  display:flex;
-  gap:12px;
-  align-items:center;
+.header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:url("assets/headerbg.png");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:cover;
+  opacity:.20;
+  z-index:1;
+  pointer-events:none;
 }
-.logo{
-  width:76px;height:76px;object-fit:contain;border-radius:0;border:none;box-shadow:none;
+
+.header > *{
+  position:relative;
+  z-index:2;
 }
-.info-text{font-size:14px;color:#222;}
+
+.h-title{
+  font-size:18px;
+  font-weight:800;
+}
+
+.h-sub{
+  font-size:14px;
+  font-weight:600;
+  color:#666;
+  margin-top:2px;
+}
+
+.h-time{
+  font-size:13px;
+  color:#666;
+  margin-top:6px;
+}
+
+.header-icon{
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  width:80px;
+  height:auto;
+  z-index:5;
+}
 
 /* user list container */
 .userlist{ padding:8px 16px 110px; }
@@ -84,13 +166,13 @@ body{
   background:#fff;
   padding:12px;
   border-radius:12px;
-  margin-bottom:12px;
+  margin-bottom:22px;
   box-shadow:0 2px 6px rgba(0,0,0,0.05);
   border:1px solid #e6e6e6; /* <<-- ensure border present */
   position:relative;
 }
 .usercard.me{
-  border:2px solid #007bff; /* highlight current user */
+  border:1px solid rgba(30,136,229,0.35);  /* lebih tipis & halus */
 }
 
 /* TAG YOU */
@@ -108,30 +190,41 @@ body{
   z-index:12;
 }
 
+
+/* role tag di bawah avatar, duduk di border bawah card */
+.role-on-border{
+  position: absolute;
+
+  /* kolom avatar kiri */
+  left: 42px;          /* setengah lebar avatar-area */
+
+  /* tepat di border bawah card */
+  bottom: 0;
+
+  /* setengah badge masuk ke dalam card */
+  transform: translate(-50%, 70%);
+
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 14px;
+  white-space: nowrap;
+  line-height: 1;
+
+  z-index: 5;
+  background: #fff;
+}
+
 /* avatar area: avatar-wrap (overflow hidden) + floating button outside but within area */
-.avatar-area{ position:relative; width:64px; height:64px; }
+.avatar-area{
+ position:relative;
+  width:64px;
+   height:64px;
+   margin-top:-6px;
+    }
 .avatar-wrap{ width:64px;height:64px;border-radius:50%;overflow:hidden; }
 .avatar-wrap img{ width:100%;height:100%; object-fit:cover; display:block; }
 
-/* floating edit button for photo (moved outside avatar-wrap but inside avatar-area) */
-.edit-foto-floating{
-  position:absolute;
-  right:-6px;
-  bottom:-6px;
-  z-index:20;
-  width:30px;
-  height:30px;
-  border-radius:50%;
-  background:#3E8BFF;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:14px;
-  border:2px solid #fff;
-  cursor:pointer;
-}
-.edit-foto-floating input{ display:none; }
 
 /* name handwriting + pencil near name */
 .name-hand{
@@ -142,7 +235,9 @@ body{
   align-items:center;
   gap:8px;
 }
-.edit-ico{ font-size:15px; color:#3E8BFF; cursor:pointer; }
+.edit-ico{
+transform: scaleX(-1);
+ font-size:15px; color:#3E8BFF; cursor:pointer; }
 
 /* username */
 .uname{ font-size:13px;color:#666; }
@@ -179,18 +274,7 @@ body{
 }
 .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
 
-/* ========== NAVBAR EXACT 1:1 (from home.html) ========== */
-.navbar{
-  position:fixed;
-  bottom:0;left:0;right:0;
-  background:#fff;
-  display:flex;
-  justify-content:space-around;
-  padding:8px 0 6px;
-  border-top:1px solid #e6e6e6;
-  box-shadow:0 -3px 10px rgba(0,0,0,0.06);
-  z-index:999;
-}
+
 .nav-item{
   display:flex; flex-direction:column; align-items:center;
   font-size:11px; font-weight:600; padding:6px 12px;
@@ -204,20 +288,43 @@ body{
 .bounce{ animation:bounceTap .25s ease-out; }
 @keyframes bounceTap{ 0%{transform:scale(1)} 40%{transform:scale(.92)} 100%{transform:scale(1)} }
 
+.fab-back{
+  position:fixed;
+  left:16px;
+  bottom:16px;
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.35);
+  box-shadow:0 6px 18px rgba(0,0,0,0.25);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+.fab-back img{
+  width:28px;
+  height:28px;
+}
+
+.last-login{
+  font-size:12px;
+  color:#888;
+  margin-top:2px;
+}
 </style>
 </head>
 
 <body>
 
 
-<!-- INFO -->
-<div class="info-card">
-  <img src="https://wendyrenzya.github.io/bigmotor/assets/logo2.png" class="logo" alt="logo">
-  <div class="info-text">
-    <div style="font-weight:700">BIG Motor Tingkulu</div>
-    <div style="font-size:13px;color:#666;margin-top:6px">
-      Jl. Tololiu Supit, Tingkulu - Wanea<br>
-      web: bigmotortingkulu.com • Katalog: bigmotor.biz.id
+<div class="sticky-top">
+  <div class="header-wrap">
+    <div class="header">
+      <div class="h-title">Akun Area</div>
+      <div class="h-sub">BIG Motor</div>
+      <div id="userHeaderTime" class="h-time"></div>
+      <img src="assets/atur.png" class="header-icon">
     </div>
   </div>
 </div>
@@ -233,6 +340,10 @@ body{
     <h3>Pilih Aksi</h3>
     <button id="optNama" style="width:100%;padding:10px;margin-top:8px;background:#3E8BFF;color:#fff;border:0;border-radius:8px;">Ganti Nama</button>
     <button id="optPass" style="width:100%;padding:10px;margin-top:8px;background:#6b7280;color:#fff;border:0;border-radius:8px;">Ganti Password</button>
+    <button id="optFoto"
+  style="width:100%;padding:10px;margin-top:8px;background:#16a34a;color:#fff;border:0;border-radius:8px;">
+  Ganti Foto
+</button>
     <button style="width:100%;padding:10px;margin-top:8px;background:#ef4444;color:#fff;border:0;border-radius:8px;" onclick="closeOption()">Batal</button>
   </div>
 </div>
@@ -265,21 +376,6 @@ body{
 <!-- TOAST -->
 <div id="toast" class="toast"></div>
 
-<!-- NAVBAR — EXACT 1:1 from home.html -->
-<div class="navbar">
-  <div class="nav-item" onclick="bounceThenNavigate(this,'home.html')">
-    <img src="assets/beranda.png">Beranda
-  </div>
-  <div class="nav-item" onclick="bounceThenNavigate(this,'barang.html')">
-    <img src="assets/barang.png">Barang
-  </div>
-  <div class="nav-item" onclick="bounceThenNavigate(this,'riwayat.html')">
-    <img src="assets/riwayat.png">Riwayat
-  </div>
-  <div class="nav-item nav-active" id="navPengaturan" onclick="bounceThenNavigate(this,'pengaturan.html')">
-    <img src="assets/pengaturan.png">Fitur
-  </div>
-</div>
 
 
 <!-- POPUP PREVIEW FOTO BARU -->
@@ -305,12 +401,40 @@ async function loadUsers(){
 }
 
 function roleColor(role){
-  role = (role||"").toLowerCase();
-  if(role.includes("admin")) return "#e53935";
-  if(role.includes("owner")) return "#8e24aa";
-  if(role.includes("mekanik")) return "#1e88e5";
-  if(role.includes("kasir")) return "#43a047";
-  return "#666";
+  role = (role || "").toLowerCase();
+
+  // Warna HEX untuk role tertentu
+  if (role.includes("admin"))   return "#e53935";
+  if (role.includes("owner"))   return "#8e24aa";
+  if (role.includes("mekanik")) return "#1e88e5";
+  if (role.includes("support"))   return "#43a047";
+
+  // Warna otomatis HSL untuk role baru
+  let hash = 0;
+  for (let i = 0; i < role.length; i++) {
+    hash = role.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash % 360);
+  return `hsl(${hue}, 65%, 45%)`;
+}
+
+function tagStyles(color){
+  // Jika HEX (role lama)
+  if (color.startsWith("#")){
+    return {
+      border: `1px solid ${color}33`,
+      background: `${color}11`,
+      text: color
+    };
+  }
+
+  // Jika HSL (role baru)
+  // background 8% opacity, border 25% opacity
+  return {
+    border: `1px solid ${color.replace("hsl", "hsla").replace(")", ", 0.25)")}`,
+    background: `${color.replace("hsl", "hsla").replace(")", ", 0.10)")}`,
+    text: color
+  };
 }
 
 let pendingFile=null, pendingId=null;
@@ -326,30 +450,69 @@ function renderUsers(list){
     const div = document.createElement("div");
     div.className = "usercard" + (isMe ? " me" : "");
     div.innerHTML = `
-      ${isMe ? '<div class="tagyou">YOU</div>' : ''}
-      <div class="avatar-area">
-        <div class="avatar-wrap">
-          <img id="pfp_${u.id}" src="${foto}" alt="">
-        </div>
-        ${isMe ? `<label class="edit-foto-floating" onclick="event.stopPropagation()">
-          <input type="file" accept="image/*" onchange="previewFoto(event, ${u.id})">
-          ✎
-        </label>` : ''}
-      </div>
-      <div style="flex:1">
-        <div class="name-hand">
-          ${u.nama || u.username}
-          ${isMe ? `<span class="edit-ico" style="margin-left:8px" onclick="event.stopPropagation(); openOption(${u.id});">✎</span>` : ''}
-        </div>
-        <div class="uname">@${u.username}</div>
-      </div>
-      <div class="role-tag" style="color:${clr};border:1px solid ${clr}33;background:${clr}11;">
-        ${u.role}
-      </div>
-    `;
+  ${isMe ? '<div class="tagyou">YOU</div>' : ''}
+  <div class="avatar-area">
+    <div class="avatar-wrap">
+      <img
+        id="pfp_${u.id}"
+        src="${foto}"
+        alt=""
+        onerror="this.onerror=null;this.src='/assets/avatar.webp';"
+      />
+    </div>
+  </div>
+
+  <div class="role-tag role-on-border"
+    style="color:${clr};border:1px solid ${clr}33;background:${clr}11;">
+    ${u.role}
+  </div>
+
+  <div style="flex:1">
+    <div class="name-hand">
+      ${u.nama || u.username}
+      ${isMe ? `<span class="edit-ico" style="margin-left:8px" onclick="event.stopPropagation(); openOption(${u.id});">✎</span>` : ''}
+    </div>
+    <div class="uname">@${u.username}</div>
+    <div class="last-login" id="ll_${u.username}"></div>
+  </div>
+`;
+const wa = WA_MAP[u.username];
+if (wa) {
+  const waBtn = document.createElement("div");
+  waBtn.className = "wa-btn";
+  waBtn.innerHTML = `
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <path fill="#FFFFFF" d="M20.52 3.48A11.88 11.88 0 0012.06 0C5.42 0 .06 5.37.06 12c0 2.11.55 4.16 1.6 5.97L0 24l6.2-1.63A11.93 11.93 0 0012.06 24C18.7 24 24 18.63 24 12a11.88 11.88 0 00-3.48-8.52zM12.06 21.9a9.87 9.87 0 01-5.03-1.38l-.36-.21-3.68.97.98-3.58-.24-.37a9.9 9.9 0 01-1.5-5.26c0-5.46 4.45-9.9 9.83-9.9a9.9 9.9 0 019.9 9.9c0 5.46-4.44 9.9-9.9 9.9zm5.48-7.4c-.3-.15-1.78-.88-2.06-.98-.28-.1-.48-.15-.68.15-.2.3-.78.98-.96 1.18-.18.2-.36.22-.66.07-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.78-1.68-2.08-.18-.3-.02-.46.13-.61.13-.13.3-.36.45-.54.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.07-.15-.68-1.64-.93-2.25-.24-.6-.49-.52-.68-.53h-.58c-.2 0-.52.07-.8.38-.27.3-1.05 1.03-1.05 2.52s1.07 2.93 1.22 3.13c.15.2 2.1 3.22 5.08 4.52.7.3 1.25.48 1.68.61.7.22 1.33.19 1.83.12.56-.08 1.78-.73 2.03-1.43.25-.7.25-1.3.17-1.43-.07-.12-.27-.2-.57-.35z"/>
+</svg>
+`;
+  waBtn.onclick = e => {
+    e.stopPropagation();
+    window.open("https://wa.me/" + wa, "_blank");
+  };
+  div.appendChild(waBtn);
+}
     div.addEventListener("click", ()=> openFullImg(foto));
     root.appendChild(div);
+// fetch last login
+fetch(API_LAST_LOGIN + "/api/users/last-login/" + u.username)
+  .then(r => r.json())
+  .then(d => {
+    const el = document.getElementById("ll_" + u.username);
+    if (!el) return;
 
+    if (!d.last_login) {
+      el.textContent = "Belum pernah login";
+      return;
+    }
+
+    const dt = new Date(d.last_login.replace(" ", "T") + "Z");
+dt.setHours(dt.getHours());
+    el.textContent =
+      "Last login: " +
+      dt.toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"}) +
+      " " +
+      dt.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+  });
     if(isMe) localStorage.setItem("userid", u.id);
   });
 }
@@ -417,8 +580,15 @@ function closeFullImg(){ document.getElementById("fullView").style.display="none
 /* option menu */
 function openOption(id){
   document.getElementById("optionBg").style.display="flex";
-  document.getElementById("optNama").onclick = ()=> { closeOption(); openNamePopup(id); };
-  document.getElementById("optPass").onclick = ()=> { closeOption(); openPassPopup(id); };
+
+  document.getElementById("optNama").onclick =
+    ()=> { closeOption(); openNamePopup(id); };
+
+  document.getElementById("optPass").onclick =
+    ()=> { closeOption(); openPassPopup(id); };
+
+  document.getElementById("optFoto").onclick =
+    ()=> { closeOption(); triggerChangeFoto(id); };
 }
 function closeOption(){ document.getElementById("optionBg").style.display="none"; }
 
@@ -434,7 +604,13 @@ async function saveName(id){
   showToast("Nama diperbarui"); closePopup(); loadUsers();
 }
 function closePopup(){ document.getElementById("popupBg").style.display="none"; }
+function triggerChangeFoto(id){
+  const input = document.getElementById("changeFotoInput");
+  if(!input) return;
 
+  input.onchange = e => previewFoto(e, id);
+  input.click();
+}
 /* password popup */
 function openPassPopup(){ document.getElementById("popupPassBg").style.display="flex"; }
 async function savePassword(){ const p = document.getElementById("popupPass").value.trim(); if(!p){ showToast("Password kosong"); return; } const id = localStorage.getItem("userid"); await fetch(API_BASE + "/api/user/password/" + id, { method:"PUT", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ password:p }) }); showToast("Password diperbarui"); closePassPopup(); }
@@ -442,6 +618,7 @@ function closePassPopup(){ document.getElementById("popupPassBg").style.display=
 
 /* toast */
 function showToast(m){ const t = document.querySelector(".toast"); t.textContent = m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),1700); }
+
 
 
 </script>
@@ -453,5 +630,26 @@ function showToast(m){ const t = document.querySelector(".toast"); t.textContent
       <button onclick="cancelSaveFoto()" style="width:100%;padding:12px;background:#ef4444;color:#fff;border:0;font-weight:700;margin-top:4px">Batal</button>
   </div>
 </div>
+<input id="changeFotoInput" type="file" accept="image/*" style="display:none">
+<div class="fab-back">
+  <img src="assets/back_white.png">
+</div>
+
+<script>
+(function(){
+  function updateUserHeaderTime(){
+    const d = new Date();
+    document.getElementById("userHeaderTime").textContent =
+      d.toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"})
+      + " • " +
+      d.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+  }
+  updateUserHeaderTime();
+  setInterval(updateUserHeaderTime, 10000);
+})();
+</script>
+<script>
+  document.querySelector(".fab-back").onclick = () => history.back();
+</script>
 </body>
 </html>

@@ -1,27 +1,89 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Stok Kosong</title>
 
 <style>
 /* HEADER (mengikuti barang.html) */
+
+/* === STICKY TOP (PERSIS RIWAYAT) === */
+.sticky-top{
+  position:sticky;
+  top:0;
+  padding:16px;
+  z-index:50;
+  background:#f4f5f7;
+}
+/* rapikan saat di dalam sticky */
+.sticky-top .cat-bar{
+  border-top:1px solid #eee;
+}
+
+.sticky-top .filter-buttons{
+  border-bottom:none;
+}
+/* === HEADER WRAP === */
+.header-wrap{
+  border-radius:18px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 10px 28px rgba(0,0,0,.12);
+}
+
+/* === HEADER === */
 .header{
-  background:linear-gradient(90deg,#e8f0ff,#f3f7ff);
+  background:linear-gradient(
+    90deg,
+    #d3e2ff 0%,
+    #e8f0ff 50%,
+    #f5f8ff 100%
+  );
   padding:14px 16px;
-  position:sticky;top:0;z-index:20;
+  text-align:left;
+  position:relative;
+  z-index:20;
   border-bottom:1px solid #e6eefc;
   padding-right:90px;
 }
+
+/* === PNG OVERLAY (WAJIB ADA) === */
+.header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:url("assets/headerbg.png");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:cover;
+  opacity:0.20;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* === HEADER CONTENT LAYER === */
+.header > *{
+  position:relative;
+  z-index:2;
+}
+
+/* === TEXT === */
 .h-title{font-size:18px;font-weight:800;}
 .h-sub{font-size:14px;font-weight:600;color:#666;margin-top:2px;}
 .h-time{font-size:13px;color:#666;margin-top:6px;}
-.header-wrap{position:relative;}
+
+/* === ICON KANAN === */
 .header-icon{
   position:absolute;
-  right:14px;top:50%;transform:translateY(-50%);
-  width:60px;height:auto;z-index:5;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  width:80px;
+  height:auto;
+  z-index:5;
+  pointer-events:none;
 }
 
 :root{
@@ -30,11 +92,10 @@
   --bg:#f5f6f8;
   --card:#ffffff;
 }
-
+body{ overflow-y:auto; }
 /* GLOBAL */
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html, body{margin:0;padding:0;width:100%;height:100%;background:var(--bg);font-family:Inter;}
-body{overflow-y:hidden;}
+html, body{margin:0;padding:0;width:100%;min-height:100%;background:var(--bg);font-family:Inter;}
 
 /* KATEGORI BAR */
 .cat-bar{
@@ -72,17 +133,14 @@ body{overflow-y:hidden;}
 
 /* GRID LIST */
 .list{
-  position:fixed;
-  top:240px;
-  left:0;right:0;bottom:0;
-  overflow-y:auto;
   padding:14px;
+  overflow:visible;
 
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:12px;
 
-  align-items:start; /* FIX overflow ketika hanya 1 item */
+  align-items:stretch;            /* jangan memaksa item mengikuti tinggi baris */
 }
 
 /* ITEM */
@@ -91,15 +149,25 @@ body{overflow-y:hidden;}
   text-align:center;
   cursor:pointer;
   box-shadow:0 4px 14px rgba(0,0,0,0.06);
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;   /* jangan stretch isi */
 }
 .g-img{
   width:70px;height:70px;border-radius:12px;
   object-fit:cover;background:#eee;margin:0 auto;
 }
 .g-name{
-  font-size:13px;font-weight:800;margin-top:6px;
-  height:32px;overflow:hidden;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  font-size:13px;
+  font-weight:800;
+  margin-top:6px;
+
+  display:-webkit-box;
+  -webkit-line-clamp:3;          /* dari 2 → 3 baris */
+  -webkit-box-orient:vertical;
+
+  overflow:hidden;
+  min-height:48px;               /* tinggi fix visual */
 }
 .g-stock{
   margin-top:4px;font-size:12px;font-weight:800;color:var(--danger);
@@ -133,17 +201,56 @@ body{overflow-y:hidden;}
   width:58px;
   height:58px;
   border-radius:50%;
-  background:#ffffff;
+  background:rgba(255,255,255,0.3);   /* transparan 0.3 */
   box-shadow:0 4px 18px rgba(0,0,0,0.18);
   display:flex;
   justify-content:center;
   align-items:center;
   cursor:pointer;
   z-index:500;
+  backdrop-filter:blur(3px);          /* opsional: biar lebih rapi */
 }
 .fab-back img{
   width:32px;
   height:32px;
+}
+/* === FILTER CARD (KATEGORI + FILTER JADI SATU) === */
+.filter-card{
+  margin-top:10px;                 /* jarak dari header */
+  background:#fff;
+  border-radius:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  overflow:hidden;
+}
+@keyframes hintShake{
+  0%   { transform: translate(-50%, -50%) translateX(0); }
+  20%  { transform: translate(-50%, -50%) translateX(-2px); }
+  40%  { transform: translate(-50%, -50%) translateX(2px); }
+  60%  { transform: translate(-50%, -50%) translateX(-1px); }
+  80%  { transform: translate(-50%, -50%) translateX(1px); }
+  100% { transform: translate(-50%, -50%) translateX(0); }
+}
+.scroll-hint{
+  position:absolute;
+  right:-4px;
+  top:70%;
+  transform:translate(-50%, -50%);
+
+  /* teks lebih kecil & ringan */
+  font-size:13px;
+  font-weight:600;
+
+  /* biru transparan, sedikit lebih gelap */
+  color:rgba(37,99,235,.85);        /* biru lebih tegas */
+  background:rgba(37,99,235,.18);   /* background lebih gelap */
+
+  border-radius:999px;
+  padding:2px 7px;
+
+  box-shadow:0 4px 10px rgba(37,99,235,.30);
+  pointer-events:none;
+
+  animation:hintShake 1.8s ease-in-out infinite;
 }
 </style>
 </head>
@@ -151,23 +258,27 @@ body{overflow-y:hidden;}
 <body>
 
 <!-- HEADER -->
-<div class="header-wrap">
-  <div class="header">
-    <div class="h-title">BIG Motor Tingkulu</div>
-    <div class="h-sub">Stok Monitor</div>
-    <div id="headerTime" class="h-time"></div>
-    <img src="assets/barang2.png" class="header-icon">
+<div class="sticky-top">
+  <div class="header-wrap">
+    <div class="header">
+      <div class="h-title">Stok Kosong</div>
+      <div class="h-sub">BIG Motor</div>
+      <div id="headerTime" class="h-time"></div>
+      <img src="assets/barang2.png" class="header-icon">
+    </div>
+  </div>
+ <div class="filter-card">
+  <div id="catBar" class="cat-bar"></div>
+<div class="scroll-hint">‹geser›</div>
+  <div class="filter-buttons">
+    <div class="f-btn" id="btnAtur">Set Minimal</div>
+    <div class="f-btn reset-btn" id="btnReset">Reset</div>
   </div>
 </div>
-
-<!-- KATEGORI -->
-<div id="catBar" class="cat-bar"></div>
-
-<!-- FILTER BUTTONS -->
-<div class="filter-buttons">
-  <div class="f-btn" id="btnAtur">Set Stock</div>
-  <div class="f-btn reset-btn" id="btnReset">Reset</div>
 </div>
+
+
+
 
 <!-- LIST -->
 <div id="listRoot" class="list">Memuat...</div>
@@ -175,8 +286,8 @@ body{overflow-y:hidden;}
 <!-- POPUP FILTER -->
 <div id="popup" class="popup-bg">
   <div class="popup">
-    <div class="popup-title">Minimum Stok</div>
-    <input id="minInput" type="number" min="0" placeholder="Contoh: 5">
+    <div class="popup-title">Tampilkan Stok &lt;X</div>
+    <input id="minInput" type="number" min="0" placeholder="Misalnya: 5">
     <div class="popup-btn popup-ok" id="okMin">Terapkan</div>
     <div class="popup-btn popup-cancel" id="cancelMin">Batal</div>
   </div>
