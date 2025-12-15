@@ -363,12 +363,66 @@ body{
   display:none;
   z-index:400;
 }
+/* === BLUR PAGE LOADER (SAMA DENGAN RIWAYAT) === */
+.page-loader{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
+  background:rgba(245,246,248,0.35);
+_toggle-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+@supports not (backdrop-filter: blur(6px)){
+  .page-loader{
+    background:rgba(245,246,248,0.85);
+  }
+}
+
+.loader-box{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  padding:20px 24px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.88);
+  box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+.spinner{
+  width:42px;
+  height:42px;
+  border:4px solid #dbe5ff;
+  border-top-color:#3E8BFF;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+
+.loader-text{
+  font-size:13px;
+  font-weight:800;
+  color:#3E8BFF;
+}
+
+@keyframes spin{
+  to{ transform:rotate(360deg); }
+}
 </style>
 </head>
 
 <body>
-
+<!-- PAGE LOADER -->
+<div id="pageLoader" class="page-loader">
+  <div class="loader-box">
+    <div class="spinner"></div>
+    <div class="loader-text">Memuat…</div>
+  </div>
+</div>
 <!-- HEADER -->
 <div class="sticky-top">
 
@@ -449,6 +503,16 @@ const token = localStorage.getItem("token");
 if (!token) location.href = "index.html";
 const API_BASE = "https://api.bigmotor.biz.id";
 
+function showLoader(){
+  const l=document.getElementById("pageLoader");
+  if(l) l.style.display="flex";
+}
+function hideLoader(){
+  const l=document.getElementById("pageLoader");
+  if(l) l.style.display="none";
+}
+showLoader();
+
 /* NAV */
 function navTo(url,el){
   el.classList.add("bounce");
@@ -528,17 +592,20 @@ let SORT="NAME_ASC"; /* default A-Z */
 load();
 
 async function load(){
-  const root=listRoot;
-  root.innerHTML=`<div style="text-align:center;color:#777;padding:18px">Memuat data...</div>`;
   try{
     let r=await fetch(API_BASE+"/api/barang");
     let j=await r.json();
     DATA=j.items||[];
+
     apply();
     loadKategori();
     handleNewItemScroll();
+
+    hideLoader();   // ⬅️ spinner HILANG setelah render
   }catch(e){
-    root.innerHTML=`<div style="text-align:center;color:#d33;padding:18px">Gagal memuat data</div>`;
+    hideLoader();
+    listRoot.innerHTML=
+      `<div style="text-align:center;color:#d33;padding:18px">Gagal memuat data</div>`;
   }
 }
 

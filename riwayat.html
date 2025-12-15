@@ -303,13 +303,67 @@ body{
  opacity:1;
  transform:translateX(-50%) translateY(-6px);
  }
+/* === BLUR LOADER OVERLAY === */
+.page-loader{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
+  background:rgba(244,245,247,0.35);     /* semi transparan */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
 
+/* fallback jika backdrop-filter tidak support */
+@supports not (backdrop-filter: blur(6px)){
+  .page-loader{
+    background:rgba(244,245,247,0.85);
+  }
+}
+
+.loader-box{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  padding:20px 24px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.85);
+  box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+.spinner{
+  width:42px;
+  height:42px;
+  border:4px solid #dbe5ff;
+  border-top-color:#3E8BFF;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+
+.loader-text{
+  font-size:13px;
+  font-weight:800;
+  color:#3E8BFF;
+}
+
+@keyframes spin{
+  to{ transform:rotate(360deg); }
+}
 </style>
 </head>
 
 <body>
-
+<!-- PAGE LOADER -->
+<div id="pageLoader" class="page-loader">
+  <div class="loader-box">
+    <div class="spinner"></div>
+    <div class="loader-text">Memuat..</div>
+  </div>
+</div>
 <!-- HEADER -->
 <div class="sticky-top">
   <div class="header-wrap">
@@ -374,7 +428,28 @@ body{
   }
 </style>
 <script>
+    function waitImageLoad(el){
+  return new Promise(resolve=>{
+    if(!el) return resolve();
+    const bg = el.style.backgroundImage;
+    if(!bg || bg === "none") return resolve();
 
+    const url = bg.slice(5, -2); // url("...")
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = () => resolve();
+    img.src = url;
+  });
+}
+function showLoader(){ 
+  const l = document.getElementById("pageLoader");
+  if(l) l.style.display = "flex";
+}
+function hideLoader(){
+  const l = document.getElementById("pageLoader");
+  if(l) l.style.display = "none";
+}
+showLoader();
 /* CEK LOGIN */
 const token = localStorage.getItem("token");
 if (!token) location.href = "index.html";
@@ -473,26 +548,32 @@ async function loadRiwayat(){
 
     if(list.length<10) done=true;
 
-    appendList(list);
+    await appendList(list);   // ⬅️ PENTING
     page++;
+
+    if(page===1){
+      hideLoader();           // ⬅️ sekarang BENAR
+    }
 
   }catch{
     $("status").textContent="Gagal memuat data.";
+    hideLoader();
   }
 
   isLoading=false;
 }
 
 /* APPEND CARD */
-function appendList(list){
+async function appendList(list){
   const wrap=$("list");
+  const waits = [];
 
   if(page===0 && !list.length){
     $("empty").style.display="block";
     return;
   }
 
-  list.forEach(tx=>{
+  for(const tx of list){
     const tid=tx.transaksi_id;
     const waktu=tx.waktu;
     const type=getType(tid);
@@ -504,9 +585,8 @@ function appendList(list){
     const left=document.createElement("div");
     left.className="left";
 
-  const av=document.createElement("div");
-av.className="avatar";
-av.textContent="";   // jangan pakai AD
+    const av=document.createElement("div");
+    av.className="avatar";
 
     const meta=document.createElement("div");
     meta.className="avatar-meta";
@@ -520,18 +600,11 @@ av.textContent="";   // jangan pakai AD
 
     const title=document.createElement("div");
     title.className="title";
-
-    title.innerHTML=
-      `<div><span class="tx-tag">${tag}</span>${
-        type==="servis"?"Servis":
-        type==="masuk"?"Stok Masuk":
-        type==="audit"?"Audit":"Penjualan"
-      }</div>`;
+    title.innerHTML=`<div><span class="tx-tag">${tag}</span>${type==="servis"?"Servis":type==="masuk"?"Stok Masuk":type==="audit"?"Audit":"Penjualan"}</div>`;
 
     const total=document.createElement("div");
     total.className="total";
     total.textContent="—";
-
     title.appendChild(total);
 
     const tm=document.createElement("div");
@@ -542,19 +615,21 @@ av.textContent="";   // jangan pakai AD
     items.className="items";
     items.textContent="Memuat detail...";
 
-    mid.appendChild(title);
-    mid.appendChild(tm);
-    mid.appendChild(items);
-
-    card.appendChild(left);
-    card.appendChild(mid);
+    mid.append(title, tm, items);
+    card.append(left, mid);
+    wrap.appendChild(card);
 
     card.onclick=()=>openDetail(tid);
 
-    wrap.appendChild(card);
+    // ⬇️ tunggu preview + image
+    waits.push(
+      fetchPreview(tid,av,meta,items,total)
+        .then(()=>waitImageLoad(av))
+    );
+  }
 
-    fetchPreview(tid,av,meta,items,total);
-  });
+  // ⬇️ TUNGGU SEMUA KARTU + GAMBAR
+  await Promise.all(waits);
 }
 
 
@@ -689,7 +764,7 @@ if (all.length > 3) {
 
 items.innerHTML = out.join("<br>");
     total.textContent=grand?currency(grand):`${all.length} item`;
-
+return true;
   }catch{
     items.textContent="Preview gagal";
     total.textContent="-";

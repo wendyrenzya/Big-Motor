@@ -229,13 +229,66 @@ body{
 }
 .nav-active{background:rgba(62,139,255,0.12);color:#3E8BFF!important;}
 .nav-active img{opacity:1!important;}
+/* === BLUR PAGE LOADER (SAMA DENGAN PAGE LAIN) === */
+.page-loader{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
+  background:rgba(244,245,247,0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+@supports not (backdrop-filter: blur(6px)){
+  .page-loader{ background:rgba(244,245,247,0.85); }
+}
+.loader-box{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  padding:20px 24px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.88);
+  box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+.spinner{
+  width:42px;height:42px;
+  border:4px solid #dbe5ff;
+  border-top-color:#3E8BFF;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+.loader-text{
+  font-size:13px;
+  font-weight:800;
+  color:#3E8BFF;
+}
+@keyframes spin{ to{transform:rotate(360deg)} }
 </style>
 </head>
 
 <body>
-
+<div id="pageLoader" class="page-loader">
+  <div class="loader-box">
+    <div class="spinner"></div>
+    <div class="loader-text">Memuat..</div>
+  </div>
+</div>
 <script>
+    function showLoader(){
+  const l=document.getElementById("pageLoader");
+  if(l) l.style.display="flex";
+}
+function hideLoader(){
+  const l=document.getElementById("pageLoader");
+  if(l) l.style.display="none";
+}
+showLoader();
+
 const token = localStorage.getItem("token");
 if(!token) location.href="index.html";
 
@@ -366,6 +419,11 @@ function showQR(){
     <img src="assets/pengaturan.png">Fitur
   </div>
 </div>
-
+<script>
+window.addEventListener("load", ()=>{
+  // halaman ini statis → cukup tunggu render + image
+  setTimeout(hideLoader, 200);
+});
+</script>
 </body>
 </html>

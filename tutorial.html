@@ -99,6 +99,55 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.20);
         font-size: 14px;
     }
+    /* WARNING SVG BOX */
+.warn-wrap{
+    background:#fff3cd;
+    border:1px solid #f1c86b;
+    border-radius:14px;
+    padding:14px 16px;
+}
+
+/* HEADER PERHATIAN */
+.warn-header{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding-bottom:8px;
+    margin-bottom:10px;
+    border-bottom:2px solid #e0b84c; /* garis pembatas */
+}
+
+.warn-title{
+    font-weight:900;
+    color:#8a1c1c; /* merah gelap */
+    letter-spacing:1px;
+}
+
+/* ISI PESAN */
+.warn-body{
+    font-size:13px;
+    line-height:1.55;
+    color:#000;
+    font-style:italic;
+    text-align:left;
+}
+
+/* BARIS ICON */
+.warn-icon-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:10px;
+}
+
+.warn-icon-row img{
+    width:44px;
+    height:44px;
+    border-radius:10px;
+    border:1px solid #e0c97f;
+    background:#fff;
+}
 </style>
 </head>
 
@@ -108,6 +157,64 @@
 <div class="header">
     Tutorial Print Struk Bengkel
     <button class="close-btn" onclick="history.back()">×</button>
+</div>
+
+<div class="card">
+  <div class="card">
+  <div class="warn-wrap">
+
+    <!-- HEADER PERHATIAN -->
+    <div class="warn-header">
+      <!-- SEGITIGA KIRI -->
+      <svg width="20" height="20" viewBox="0 0 24 24"
+           xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 3L1 21H23L12 3Z"
+              fill="#f1c86b"
+              stroke="#8a1c1c"
+              stroke-width="1.6"/>
+        <line x1="12" y1="8" x2="12" y2="14"
+              stroke="#8a1c1c"
+              stroke-width="2"
+              stroke-linecap="round"/>
+        <circle cx="12" cy="17"
+                r="1.2"
+                fill="#8a1c1c"/>
+      </svg>
+
+      <div class="warn-title">PERHATIAN</div>
+
+      <!-- SEGITIGA KANAN -->
+      <svg width="20" height="20" viewBox="0 0 24 24"
+           xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 3L1 21H23L12 3Z"
+              fill="#f1c86b"
+              stroke="#8a1c1c"
+              stroke-width="1.6"/>
+        <line x1="12" y1="8" x2="12" y2="14"
+              stroke="#8a1c1c"
+              stroke-width="2"
+              stroke-linecap="round"/>
+        <circle cx="12" cy="17"
+                r="1.2"
+                fill="#8a1c1c"/>
+      </svg>
+    </div>
+
+    <!-- PESAN -->
+    <div class="warn-body">
+      Aplikasi printer terbaru saat ini tidak lagi memakai ikon robot hijau
+      seperti saat tutorial ini dibuat dan akan muncul di homescreen.
+    </div>
+
+    <!-- ICON APLIKASI -->
+    <div class="warn-icon-row">
+      <img src="assets/printericon.png" alt="Icon Printer Terbaru">
+      <div class="warn-body">
+        Ikon aplikasi terbaru saat ini adalah seperti gambar di samping.
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <!-- CARD 1 -->

@@ -736,15 +736,35 @@ $("kategoriSelect").onclick = (e)=>{
   else openKategori();
 };
 
-$("btnKeywordSearch").onclick = async () => {
-  let keyword = prompt("Masukkan keyword pencarian");
+// === KEYWORD POPUP (CUSTOM UI, TANPA PROMPT) ===
+const keywordPopup   = $("keywordPopup");
+const keywordInput   = $("keywordInput");
+const keywordCancel  = $("keywordCancel");
+const keywordSearch  = $("keywordSearch");
 
-  if (!keyword || !keyword.trim()) {
+// buka popup
+$("btnKeywordSearch").onclick = () => {
+  keywordInput.value = "";
+  keywordPopup.style.display = "flex";
+  setTimeout(() => keywordInput.focus(), 50);
+};
+
+// batal
+keywordCancel.onclick = () => {
+  keywordPopup.style.display = "none";
+};
+
+// cari
+keywordSearch.onclick = async () => {
+  const keyword = keywordInput.value.trim();
+  if (!keyword) {
     showNotif("Keyword kosong");
     return;
   }
 
-  // buka popup
+  keywordPopup.style.display = "none";
+
+  // buka popup hasil
   $("imgSearchPopup").style.display = "flex";
   const list = $("imgSearchList");
   list.innerHTML = "Mencari foto dari Google…";
@@ -761,7 +781,8 @@ $("btnKeywordSearch").onclick = async () => {
     const imgs = (j.items || []).map(x => x.link);
 
     if (!imgs.length) {
-      list.innerHTML = "<div style='padding:15px;text-align:center;color:#777'>Tidak ada hasil.</div>";
+      list.innerHTML =
+        "<div style='padding:15px;text-align:center;color:#777'>Tidak ada hasil.</div>";
       return;
     }
 
@@ -782,7 +803,8 @@ $("btnKeywordSearch").onclick = async () => {
     });
 
   } catch (e) {
-    list.innerHTML = "<div style='padding:15px;text-align:center;color:#777'>Terjadi kesalahan.</div>";
+    list.innerHTML =
+      "<div style='padding:15px;text-align:center;color:#777'>Terjadi kesalahan.</div>";
   }
 };
 
@@ -844,6 +866,42 @@ $("btnFotoToggle").onclick = () => {
     <div class="cropButtons">
       <button id="cropCancel" class="btn-muted" style="flex:1;">Batal</button>
       <button id="cropFinalOk" class="btn" style="flex:1;">OK</button>
+    </div>
+  </div>
+</div>
+<!-- KEYWORD POPUP -->
+<div id="keywordPopup" style="
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.45);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999999;">
+
+  <div style="
+    background:#fff;
+    width:90%;
+    max-width:420px;
+    padding:16px;
+    border-radius:14px;">
+
+    <div style="font-weight:800;margin-bottom:10px;">
+      Masukkan Keyword
+    </div>
+
+    <input id="keywordInput"
+           class="input"
+           placeholder="Contoh: shock motor"
+           autocomplete="off"
+           spellcheck="false">
+
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button id="keywordCancel" class="btn-muted" style="flex:1">
+        Batal
+      </button>
+      <button id="keywordSearch" class="btn" style="flex:1">
+        Cari
+      </button>
     </div>
   </div>
 </div>
