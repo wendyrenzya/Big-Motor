@@ -1,9 +1,10 @@
 {
-  "versionCode": 3,
-  "versionName": "1.2.8",
+  "versionCode": 1,
+  "versionName": "1.2.7",
   "buildTime": "2025-12-18T00:00:00Z",
-  "force": true,
+  "force": false,
   "apkUrl": "https://wendyrenzya.github.io/bigmotor/bigmotor.apk"
 
 }
+
 
