@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Peraturan Aplikasi</title>
+
+<style>
+:root{
+  --bg:#f4f6fb;
+  --card:#ffffff;
+  --text:#1b1b1b;
+
+  --general:#2563eb;
+  --mekanik:#059669;
+
+  --line-blue:#c7d7f2;
+  --line-red:#e57373;
+  --divider:#e5e7eb;
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+body{
+  margin:0;
+  font-family:Inter,Segoe UI,Roboto,Arial;
+  background:var(--bg);
+  color:var(--text);
+  padding-bottom:40px;
+}
+
+/* ===== HEADER ===== */
+.sticky-top{
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:#ffffff;
+  padding:12px;
+}
+
+.header-wrap{
+  border-radius:18px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 10px 28px rgba(0,0,0,.12);
+}
+
+.header{
+  background:linear-gradient(
+    90deg,
+    #d3e2ff 0%,
+    #e8f0ff 50%,
+    #f5f8ff 100%
+  );
+  padding:14px 16px;
+  padding-right:90px;
+  position:relative;
+}
+
+.header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:url("assets/headerbg.png") center/cover no-repeat;
+  opacity:.20;
+}
+
+.header > *{ position:relative; z-index:2; }
+
+.h-title{ font-size:18px; font-weight:800; }
+.h-sub{ font-size:14px; color:#666; margin-top:2px; }
+.h-time{ font-size:13px; color:#666; margin-top:6px; }
+
+.header-icon{
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  width:80px;
+}
+
+/* ===== CONTENT ===== */
+.wrap{
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:36px;
+}
+
+/* ===== CATEGORY ===== */
+.category{
+  text-align:center;
+}
+
+.category-icon{
+  margin-bottom:8px;
+}
+
+.category-icon svg{
+  width:36px;
+  height:36px;
+  stroke:#9ca3af;
+}
+
+.section-title{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  font-size:17px;
+  font-weight:900;
+}
+
+.badge{
+  padding:4px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  color:#fff;
+}
+.badge.general{ background:var(--general); }
+.badge.mekanik{ background:var(--mekanik); }
+
+.category-cards{
+  margin-top:22px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+/* ===== RULE CARD ===== */
+.rule-card{
+  background:var(--card);
+  border-radius:18px;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+  overflow:hidden;
+}
+
+.rule-inner{
+  display:grid;
+  grid-template-columns:64px 1fr;
+}
+
+/* LEFT */
+.rule-left{
+  display:flex;
+  flex-direction:column;
+  border-right:1px solid var(--divider);
+}
+
+.rule-left-top,
+.rule-left-bottom{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.rule-left-top{
+  border-bottom:1px solid var(--divider);
+}
+
+.scale-icon{
+  width:26px;
+  height:26px;
+  stroke:#9ca3af;
+}
+
+.rule-number{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:#f3f4f6;
+  color:#4b5563;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-weight:700;
+  font-size:13px;
+}
+
+/* ===== RIGHT — LINED PAPER (AKURAT) ===== */
+.rule-right{
+  --lh:1.9em;              /* SATU-SATUNYA KUNCI */
+  padding:16px 18px 16px 22px;
+  font-size:15px;
+  line-height:var(--lh);
+  text-align:justify;
+  color:#1f2937;
+
+  /* garis margin merah */
+  border-left:2px solid var(--line-red);
+
+  /* garis biru mengikuti baris teks */
+  background:
+    linear-gradient(to bottom,
+      transparent calc(var(--lh) - 1px),
+      var(--line-blue) calc(var(--lh))
+    );
+  background-size:100% var(--lh);
+  background-position-y:0.95em; /* sejajar baseline */
+}
+
+/* FAB */
+.fab-back{
+  position:fixed;
+  left:18px;
+  bottom:18px;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:#ffffff;
+  box-shadow:0 4px 18px rgba(0,0,0,0.22);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.fab-back img{ width:32px; }
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="sticky-top">
+  <div class="header-wrap">
+    <div class="header">
+      <div class="h-title">Peraturan Bengkel</div>
+      <div class="h-sub">BIG Motor</div>
+      <div id="headerTime" class="h-time"></div>
+      <img src="assets/bonus2.png" class="header-icon">
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="content"></div>
+
+<div class="fab-back" onclick="history.back()">
+  <img src="assets/back_white.png">
+</div>
+
+<script>
+function updateHeaderTime(){
+  const d=new Date();
+  headerTime.textContent =
+    d.toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"})
+    +" • "+
+    d.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+}
+updateHeaderTime();
+setInterval(updateHeaderTime,10000);
+
+function cap(text){
+  text=text.trim();
+  return text ? text[0].toUpperCase()+text.slice(1) : "";
+}
+
+fetch("https://wendyrenzya.github.io/bigmotor/rules.txt", {
+  cache: "no-store"
+})
+  .then(r=>r.text())
+  .then(t=>{
+    const blocks=t
+      .split(/\n\s*\n/)
+      .map(b=>b.replace(/\n/g," ").trim())
+      .filter(Boolean);
+
+    const general=[], mekanik=[];
+    blocks.forEach(txt=>{
+      if(txt.toLowerCase().includes("mekanik")) mekanik.push(txt);
+      else general.push(txt);
+    });
+
+    const root=document.getElementById("content");
+
+    function renderCategory(title, cls, list){
+      if(!list.length) return;
+
+      const cat=document.createElement("div");
+      cat.className="category";
+
+      cat.innerHTML=`
+        <div class="category-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+            <path d="M12 3v18"/>
+            <path d="M4 7h16"/>
+            <path d="M6 7l-3 6h6l-3-6z"/>
+            <path d="M18 7l-3 6h6l-3-6z"/>
+          </svg>
+        </div>
+
+        <div class="section-title">
+          ${title}
+          <span class="badge ${cls}">${list.length}</span>
+        </div>
+
+        <div class="category-cards"></div>
+      `;
+
+      const cards=cat.querySelector(".category-cards");
+
+      list.forEach((t,i)=>{
+        const card=document.createElement("div");
+        card.className="rule-card";
+        card.innerHTML=`
+          <div class="rule-inner">
+            <div class="rule-left">
+              <div class="rule-left-top">
+                <svg class="scale-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+                  <path d="M12 3v18"/>
+                  <path d="M4 7h16"/>
+                  <path d="M6 7l-3 6h6l-3-6z"/>
+                  <path d="M18 7l-3 6h6l-3-6z"/>
+                </svg>
+              </div>
+              <div class="rule-left-bottom">
+                <div class="rule-number">${i+1}</div>
+              </div>
+            </div>
+            <div class="rule-right">${cap(t)}</div>
+          </div>
+        `;
+        cards.appendChild(card);
+      });
+
+      root.appendChild(cat);
+    }
+
+    renderCategory("Untuk Semua","general",general);
+    renderCategory("Untuk Mekanik","mekanik",mekanik);
+  });
+</script>
+
+</body>
+</html>
