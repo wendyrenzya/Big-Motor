@@ -1,0 +1,33 @@
+mekanik dilarang mengambil barang langsung tanpa melalui admin
+
+mekanik berhak memperjual-belikan barang bekas copotan servis selama didapat dengan cara yang jujur tanpa menipu customer
+
+mekanik berhak menjual besi bekas atau sparepart buangan yang tidak terpakai, dan hasil penjualannya 100% milik mekanik
+
+seluruh staf berhak mendapatkan makan siang selama RM buka, jika tidak buka / habis maka akan mengikuti kebijakan bengkel
+
+mekanik harus membersihkan sisa pekerjaannya dan membuang sampah pada tempatnya, jika kedapatan tidak membersihkan, maka seluruh haknya terhadap barang bekas copotan dicabut
+
+mekanik dilarang keras menjual barang sendiri dengan alasan apapun. setiap permintaan pembelian oleh customer di luar bengkel, harus dikonfirmasikan ke bengkel dulu
+
+jika ada barang yang habis atau tidak tersedia, bengkel punya HAK untuk memesan terlebih dulu di rekanan bengkel lain dan menentukan harga jualnya
+
+semua servis tanpa pembelian di bengkel dikenakan biaya charge, berlaku juga untuk penggunaan las yang memakai listrik dan batang las
+
+semua pembayaran baik barang maupun biaya mekanik harus melalui admin, dan wajib diberikan struk transaksi
+
+jika terjadi ketidaksesuaian stock, bengkel berhak memutuskan penyelesaian dan ganti rugi se adil-adilnya
+
+hasil penjualan oli bekas dibagi dua antara staf dan bengkel, kemudian setelah dibagi dua, baru dibagi rata ke semua staf
+
+uang angin wajib disetorkan ke bengkel untuk menunjang biaya operasional
+
+biaya operasional seperti uang bensin, pembelian lem, dll wajib mendapatkan persetujuan terlebih dahulu
+
+mekanik dilarang melanjutkan kegiatan servis diluar jam buka
+
+dilarang keras memindahkan, mengubah, ataupun menutupi pandangan cctv apalagi sengaja mematikannya karena cctv adalah alat bukti yang adil jika terjadi kehilangan/ketidakcocokan stock untuk kepentingan bersama
+
+seluruh staf berhak mendapatkan bonus selama mengikuti ketentuan yaitu, melakukan penjualan di aplikasi untuk role admin serta melakukan start servis di aplikasi untuk role lain
+
+hal-hal yang belum diatur disini akan ditambahkan kemudian jika ada peristiwa atau situasi tambahan
