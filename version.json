@@ -2,10 +2,11 @@
   "versionCode": 4,
   "versionName": "1.7.5",
   "buildTime": "2025-12-18T00:00:00Z",
-  "force": true,
+  "force": false,
   "apkUrl": "https://wendyrenzya.github.io/bigmotor/bigmotor.apk"
 
 }
+
 
 
 
